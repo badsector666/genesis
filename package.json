@@ -1,0 +1,12 @@
+{
+    "name": "bibobot",
+    "version": "2023.3.0",
+    "description": "A Python-based trading bot that leverages the volatility of the crypto market to make profits.",
+    "repository": "https://github.com/yoratoni/bibobot.git",
+    "author": "yoratoni <yoratoni.dev@gmail.com>",
+    "license": "MIT",
+    "private": true,
+    "workspaces": [
+        "packages/*"
+    ]
+}
