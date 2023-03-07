@@ -8,12 +8,13 @@
     "private": true,
     "type": "commonjs",
     "scripts": {
-        "start": "ts-node src/client/main.ts"
+        "start": "ts-node src/client/scripts/main.ts"
     },
     "dependencies": {
         "ethers": "^6.0.8",
         "fs-extra": "^11.1.0",
-        "ts-node": "^10.9.1"
+        "ts-node": "^10.9.1",
+        "zeromq": "5"
     },
     "devDependencies": {
         "@types/node": "^18.14.6",
