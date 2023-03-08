@@ -3,6 +3,9 @@
 # IDE
 **/.vscode
 
+# Logs
+**/logs
+
 # .env files
 .env
 

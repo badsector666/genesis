@@ -1,6 +1,9 @@
 import ccxt from "ccxt";
 import "helpers/env";
 
+import { loadExchange } from "tools/exchange";
+
+loadExchange();
 
 // const exchange = new ccxt.binance({
 //     apiKey: process.env.BINANCE_SANDBOX_API_KEY,
