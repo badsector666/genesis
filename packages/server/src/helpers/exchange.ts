@@ -6,13 +6,14 @@ import logger from "helpers/logger";
 
 /**
  * Load the a exchange instance (rate limited).
- * Note: Should be called once per application.
+ *
+ * **WARNING!** Should be called once per application.
  * @returns The exchange.
  */
-export function loadExchange(): ccxt.Exchange {
+export function loadExchange(sandbox: boolean): ccxt.Exchange {
     const keys = {
-        apiKey: EXCHANGE_CONFIG.sandboxMode ? EXCHANGE_CONFIG.sandboxApiKey : EXCHANGE_CONFIG.apiKey,
-        secret: EXCHANGE_CONFIG.sandboxMode ? EXCHANGE_CONFIG.sandboxApiSecret : EXCHANGE_CONFIG.apiSecret
+        apiKey: sandbox ? EXCHANGE_CONFIG.sandboxApiKey : EXCHANGE_CONFIG.apiKey,
+        secret: sandbox ? EXCHANGE_CONFIG.sandboxApiSecret : EXCHANGE_CONFIG.apiSecret
     };
 
     const exchange = new ccxt.binance({
@@ -21,14 +22,53 @@ export function loadExchange(): ccxt.Exchange {
         enableRateLimit: true
     });
 
-    exchange.setSandboxMode(EXCHANGE_CONFIG.sandboxMode);
+    exchange.setSandboxMode(sandbox);
 
     // Log the exchange information
     logger.info(
-        `${exchange.name} exchange loaded in ${EXCHANGE_CONFIG.sandboxMode ? "sandbox" : "production"} mode.`
+        `${exchange.name} exchange loaded in ${sandbox ? "sandbox" : "production"} mode.`
     );
 
     return exchange;
+}
+
+/**
+ * Check the exchange status.
+ *
+ * NOTES:
+ * - The printed eta represents when the maintenance/outage is expected to end.
+ * - The exchange status is not available in sandbox mode, skipping it.
+ *
+ * @param exchange The exchange.
+ * @param fatal If the exchange is not reliable, should the application exit?
+ * @returns The status (boolean if status -> ok).
+ */
+export async function checkExchangeStatus(exchange: ccxt.Exchange, fatal = true): Promise<boolean> {
+    let status;
+
+    try {
+        status = await exchange.fetchStatus();
+    } catch (error) {
+        logger.warn(`${exchange.name} status check is unavailable in sandbox mode! Skipping...`);
+        return true;
+    }
+
+    // Log the status information
+    const eta = status.eta ? new Date(status.eta).toLocaleString() : "N/A";
+
+    logger.info(`${exchange.name} status checked.`);
+    logger.verbose(`${exchange.name} status: ${status.status}, eta: ${eta}.`);
+
+    // Fatal error if exchange is not reliable
+    if (status.status !== "ok") {
+        logger.error("Exchange is not reliable!");
+
+        if (fatal) {
+            process.exit(1);
+        }
+    }
+
+    return status.status === "ok";
 }
 
 /**
@@ -43,6 +83,20 @@ export async function loadMarkets(exchange: ccxt.Exchange): Promise<ccxt.Diction
     logger.info(`${exchange.name} markets loaded.`);
 
     return markets;
+}
+
+/**
+ * Load the exchange balances (every token).
+ * @param exchange The exchange.
+ * @returns The balances.
+ */
+export async function loadBalance(exchange: ccxt.Exchange): Promise<ccxt.Balances> {
+    const balance = await exchange.fetchBalance();
+
+    // Log the balance information
+    logger.info(`${exchange.name} balances loaded.`);
+
+    return balance;
 }
 
 /**
@@ -148,4 +202,23 @@ export async function precalculateFees(
     fee.totalCost = fee.transactionCost + fee.tradingFee;
 
     return fee;
+}
+
+/**
+ * Fetch the exchange time to get the local/exchange time synchronization difference.
+ * @param exchange The exchange.
+ * @returns The time (UNIX).
+ */
+export async function exchangeTimeDifference(exchange: ccxt.Exchange): Promise<number> {
+    let fetchTimeDelay = performance.now();
+    const serverTime = await exchange.fetchTime();
+    fetchTimeDelay = performance.now() - fetchTimeDelay;
+    const localTime = Date.now();
+
+    const timeDifference = serverTime - (localTime + Math.round(fetchTimeDelay));
+
+    // Log the time information
+    logger.verbose(`Difference between ${exchange.name} and local time: ${timeDifference}ms.`);
+
+    return timeDifference;
 }

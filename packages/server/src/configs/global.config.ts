@@ -21,7 +21,6 @@ export const NETWORK_CONFIG = {
  * Exchange configuration.
  */
 export const EXCHANGE_CONFIG = {
-    sandboxMode: true,
     sandboxApiKey: process.env.BINANCE_SANDBOX_API_KEY,
     sandboxApiSecret: process.env.BINANCE_SANDBOX_API_SEC,
     apiKey: process.env.BINANCE_API_KEY,

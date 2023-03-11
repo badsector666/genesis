@@ -1,9 +1,9 @@
-import "helpers/env";
+import "configs/env";
 
 import Bot from "classes/bot";
 
 
-const bot = new Bot("MATIC/USDT");
+const bot = new Bot("MATIC/USDT", true);
 
 
 // import {
