@@ -5,6 +5,20 @@ import logger from "helpers/logger";
 
 
 /**
+ * Parse the trading pair to two tokens.
+ * @param tradingPair The trading pair.
+ * @returns The tokens (base & quote).
+ */
+export function parseTradingPair(tradingPair: string) {
+    const tokens = tradingPair.split("/");
+
+    return {
+        base: tokens[0],
+        quote: tokens[1]
+    };
+}
+
+/**
  * Load the a exchange instance (rate limited).
  *
  * **WARNING!** Should be called once per application.
@@ -90,14 +104,33 @@ export async function loadMarkets(exchange: ccxt.Exchange): Promise<ccxt.Diction
  * @param exchange The exchange.
  * @returns The balances.
  */
-export async function loadBalance(exchange: ccxt.Exchange): Promise<ccxt.Balances> {
-    const balance = await exchange.fetchBalance();
+export async function loadBalances(exchange: ccxt.Exchange): Promise<ccxt.Balances> {
+    const balances = await exchange.fetchBalance();
 
     // Log the balance information
     logger.info(`${exchange.name} balances loaded.`);
 
+    return balances;
+}
+
+/**
+ * Fetch balance by token based on the balances dictionary.
+ * @param balances The loaded balances.
+ * @param token The token.
+ * @returns The balance.
+ */
+export function getBalance(balances: ccxt.Balances, token: string): ccxt.Balance {
+    const balance = balances[token];
+
+    // Log the balance information
+    logger.info(`${balance.free} ${token} available.`);
+    logger.verbose(`${balance.used} ${token} in use.`);
+    logger.verbose(`${balance.total} ${token} total.`);
+
     return balance;
 }
+
+
 
 /**
  * Fetch the latest ticker data by trading symbol.
@@ -116,6 +149,9 @@ export async function fetchTicker(exchange: ccxt.Exchange, symbol: string): Prom
 
 /**
  * Fetch the order book for a symbol.
+ * @param exchange The exchange.
+ * @param symbol The symbol.
+ * @returns The order book.
  */
 export async function fetchOrderBook(exchange: ccxt.Exchange, symbol: string): Promise<ccxt.OrderBook> {
     const orderBook = await exchange.fetchOrderBook(symbol);
@@ -128,6 +164,9 @@ export async function fetchOrderBook(exchange: ccxt.Exchange, symbol: string): P
 
 /**
  * Fetch the trades for a symbol.
+ * @param exchange The exchange.
+ * @param symbol The symbol.
+ * @returns The trades.
  */
 export async function fetchTrades(exchange: ccxt.Exchange, symbol: string): Promise<ccxt.Trade[]> {
     const trades = await exchange.fetchTrades(symbol);
@@ -218,7 +257,7 @@ export async function exchangeTimeDifference(exchange: ccxt.Exchange): Promise<n
     const timeDifference = serverTime - (localTime + Math.round(fetchTimeDelay));
 
     // Log the time information
-    logger.verbose(`Difference between ${exchange.name} and local time: ${timeDifference}ms.`);
+    logger.warn(`Difference between ${exchange.name} and local time: ${timeDifference}ms.`);
 
     return timeDifference;
 }
