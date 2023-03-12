@@ -3,7 +3,9 @@ import "configs/env";
 import Bot from "classes/bot";
 
 
-const bot = new Bot("MATIC/USDT", true);
+const bot = new Bot("MATIC/USDT", "Rompish", true);
+
+bot.closeMongoDB();
 
 
 // import {

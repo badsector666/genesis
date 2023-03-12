@@ -6,10 +6,10 @@ import logger from "helpers/logger";
 
 /**
  * Check network reliability.
- * @param fatal If the network is not reliable, should the application exit?
+ * @param fatal If the network is not reliable, should the application exit? (default: true)
  * @returns True if test passed.
  */
-export default async function checkNetwork(fatal = true): Promise<boolean> {
+export async function checkNetwork(fatal = true): Promise<boolean> {
     let networkResult = null;
 
     logger.info("Getting network data for reliability check...");
@@ -41,7 +41,7 @@ export default async function checkNetwork(fatal = true): Promise<boolean> {
             upload: upload.toFixed(3)
         };
 
-        const stringRes = `D: ${result.download} Mbit/s, U: ${result.upload} Mbit/s, L: ${result.latency} ms, J: ${result.jitter} ms`;
+        const stringRes = `D: ${result.download} MB/s, U: ${result.upload} MB/s, L: ${result.latency} ms, J: ${result.jitter} ms`;
 
         let testPassed = true;
 

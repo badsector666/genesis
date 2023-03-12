@@ -54,7 +54,7 @@ export function loadExchange(sandbox: boolean): ccxt.Exchange {
  * - The exchange status is not available in sandbox mode, skipping it.
  *
  * @param exchange The exchange.
- * @param fatal If the exchange is not reliable, should the application exit?
+ * @param fatal If the exchange is not reliable, should the application exit? (default: true)
  * @returns The status (boolean if status -> ok).
  */
 export async function checkExchangeStatus(exchange: ccxt.Exchange, fatal = true): Promise<boolean> {
@@ -123,9 +123,7 @@ export function getBalance(balances: ccxt.Balances, token: string): ccxt.Balance
     const balance = balances[token];
 
     // Log the balance information
-    logger.info(`${balance.free} ${token} available.`);
-    logger.verbose(`${balance.used} ${token} in use.`);
-    logger.verbose(`${balance.total} ${token} total.`);
+    logger.info(`${balance.free} ${token} available, ${balance.used} ${token} used.`);
 
     return balance;
 }
@@ -205,6 +203,9 @@ export async function fetchOHLCV(
  *
  * **WARNING!** This method is experimental, unstable and may produce
  * incorrect results in certain cases.
+ *
+ * Note that the fees with Binance are fixed, so this method is not
+ * incorrect for this exchange.
  * @param exchange The exchange.
  * @param symbol The symbol.
  * @param type The type.

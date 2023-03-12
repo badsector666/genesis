@@ -1,8 +1,12 @@
 import * as readline from "readline";
 
+import logger from "helpers/logger";
+
 
 /**
  * Asks the user for input and returns the answer.
+ * @param question The question to ask the user.
+ * @returns The answer.
  */
 export function getUserInput(question: string): Promise<string> {
     const rl = readline.createInterface({
@@ -11,7 +15,9 @@ export function getUserInput(question: string): Promise<string> {
     });
 
     return new Promise((resolve) => {
-        rl.question(question, (answer) => {
+        logger.warn(question);
+
+        rl.question("", (answer) => {
             rl.close();
             resolve(answer);
         });

@@ -11,6 +11,7 @@
     },
     "dependencies": {
         "ccxt": "^2.9.7",
+        "date-and-time": "^2.4.2",
         "dotenv": "^16.0.3",
         "mongodb": "^5.1.0",
         "speedtest-net": "^2.2.0",
