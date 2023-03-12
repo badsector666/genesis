@@ -29,6 +29,7 @@ declare namespace NsBot {
      */
     interface IsStatistics {
         _id: string;
+        _name: string;
         _initTime: string;
         _tradingCount: number;
         _isSandBox: boolean;

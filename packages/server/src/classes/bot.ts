@@ -27,6 +27,7 @@ export default class Bot {
 
     private _statistics: NsBot.IsStatistics = {
         _id: "",
+        _name: "",
         _initTime: "",
         _tradingCount: 0,
         _isSandBox: false,
@@ -160,18 +161,21 @@ export default class Bot {
 
                     // Set the statistics static data
                     this._statistics._id = identifierHash;
+                    this._statistics._name = identifier;
                     this._statistics._initTime = date.format(new Date(), "YYYY-MM-DD HH:mm:ss");
                     this._statistics._isSandBox = sandbox;
                     this._statistics._tradingPair = tradingPair;
                     this._statistics._initialQuoteBalance = initialQuoteBalance;
 
+                    // Send the statistics to MongoDB
                     // Override these data if already in the database
-                    const statistics = await mongoWrapper.statistics(
+                    this._statistics = await mongoWrapper.statistics(
                         this._mongoDB.mongoDB,
                         this._statistics
                     ) as NsBot.IsStatistics;
 
-                    console.log(statistics);
+                    // Statistics overwritten by the bot
+                    this._statistics._initialQuoteBalance = initialQuoteBalance;
                 }
             } else {
                 logger.error("Network is not reliable, cannot connect to MongoDB!");
