@@ -30,7 +30,7 @@ export async function checkNetwork(fatal = true): Promise<boolean> {
     }
 
     if (networkResult !== null) {
-        // Convert the bandwidths to Mbit/s
+        // Convert the bandwidths to Mo/s
         const download = networkResult.download.bandwidth / 1024 / 1024;
         const upload = networkResult.upload.bandwidth / 1024 / 1024;
 
@@ -41,7 +41,7 @@ export async function checkNetwork(fatal = true): Promise<boolean> {
             upload: upload.toFixed(3)
         };
 
-        const stringRes = `D: ${result.download} MB/s, U: ${result.upload} MB/s, L: ${result.latency} ms, J: ${result.jitter} ms`;
+        const stringRes = `D: ${result.download} Mo/s, U: ${result.upload} Mo/s, L: ${result.latency} ms, J: ${result.jitter} ms`;
 
         let testPassed = true;
 
@@ -56,12 +56,12 @@ export async function checkNetwork(fatal = true): Promise<boolean> {
         }
 
         if (download < NETWORK_CONFIG.downloadLimit) {
-            logger.error(`Network download speed is too low [${result.download} Mbit/s].`);
+            logger.error(`Network download speed is too low [${result.download} Mo/s].`);
             testPassed = false;
         }
 
         if (upload < NETWORK_CONFIG.uploadLimit) {
-            logger.error(`Network upload speed is too low [${result.upload} Mbit/s].`);
+            logger.error(`Network upload speed is too low [${result.upload} Mo/s].`);
             testPassed = false;
         }
 

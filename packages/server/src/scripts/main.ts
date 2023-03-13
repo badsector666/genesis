@@ -3,9 +3,13 @@ import "configs/env";
 import Bot from "classes/bot";
 
 
-const bot = new Bot("MATIC/USDT", "Rompish", true);
+const bot = new Bot("MATIC/USDT", "Rompish", true, 20);
 
-bot.closeMongoDB();
+
+setTimeout(async () => {
+    await bot.stop();
+}, 5000); // 5000 milliseconds = 5 seconds
+
 
 
 // import {

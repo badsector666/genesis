@@ -1,4 +1,6 @@
+import date from "date-and-time";
 import { Db, MongoClient, ObjectId } from "mongodb";
+
 
 import logger from "helpers/logger";
 import NsBot from "types/bot";
@@ -24,7 +26,7 @@ export async function connectToDB(fatal = true) {
             mongoDB: mongoDB
         };
     } catch (error) {
-        logger.error(`Error while connecting to MongoDB:\n${error}.`);
+        logger.error(`Error while connecting to the MongoDB database:\n${error}.`);
 
         if (fatal) {
             process.exit(1);
@@ -47,9 +49,38 @@ export async function closeDBConnection(mongoClient: MongoClient) {
             await mongoClient.close();
         }
 
-        logger.info("Successfully closed MongoDB connection.");
+        logger.verbose("Successfully closed the database connection.");
     } catch (error) {
-        logger.error(`Error while closing MongoDB connection:\n${error}.`);
+        logger.error(`Error while closing the database connection:\n${error}.`);
+    }
+}
+
+/**
+ * Check if the statistics already exist in the database.
+ * @param mongoDB The MongoDB database.
+ * @param mongoIdentifier The bot identifier (objectID from MongoDB).
+ * @param sandbox If the statistics are from a sandbox.
+ * @returns If the statistics exist.
+ */
+export async function checkStatistics(mongoDB: Db, mongoIdentifier: string, sandbox: boolean) {
+    try {
+        const result = await mongoDB.collection("statistics").findOne({
+            _id: ObjectId.createFromHexString(mongoIdentifier),
+            _isSandbox: sandbox
+        });
+
+        if (result) {
+            logger.verbose("Statistics for this bot found inside the database.");
+
+            return true;
+        } else {
+            logger.verbose("Statistics for this bot do not exist inside the database.");
+
+            return false;
+        }
+    } catch (error) {
+        logger.error(`Error while checking statistics from the database:\n${error}.`);
+        return false;
     }
 }
 
@@ -64,40 +95,78 @@ export async function sendStatistics(mongoDB: Db, statistics: NsBot.IsStatistics
             ...statistics,
             _id: new ObjectId(statistics._id)
         });
+
+        logger.verbose("Statistics sent to the database.");
     } catch (error) {
-        logger.error(`Error while sending statistics to MongoDB:\n${error}.`);
+        logger.error(`Error while sending statistics to the database:\n${error}.`);
     }
 }
 
 /**
- * Main statistics function for the MongoDB database,
- * verifies if the identifier already exists, if it's the case,
- * it returns the statistics, otherwise it sends the new ones to the database.
+ * Update the statistics inside the MongoDB database.
  * @param mongoDB The MongoDB database.
  * @param statistics The statistics.
- * @returns The statistics.
+ * @param update If the statistics should be updated.
  */
-export async function statistics(mongoDB: Db, statistics: NsBot.IsStatistics) {
+export async function updateStatistics(mongoDB: Db, statistics: NsBot.IsStatistics) {
+    try {
+        const {
+            _id,
+            _isSandbox,
+            ...updateFields
+        } = statistics;
+
+        await mongoDB.collection("statistics").updateOne(
+            {
+                _id: ObjectId.createFromHexString(_id),
+                _isSandbox: _isSandbox
+            },
+            {
+                $set: {
+                    ...updateFields,
+                    _lastStatsUpdate: date.format(new Date(), "YYYY-MM-DD HH:mm:ss")
+                }
+            }
+        );
+
+        logger.verbose("Statistics updated into the database.");
+    } catch (error) {
+        logger.error(`Error while updating statistics to database:\n${error}.`);
+    }
+}
+
+/**
+ * Get statistics from the MongoDB database.
+ * @param mongoDB The MongoDB database.
+ * @param mongoIdentifier The bot identifier (objectID from MongoDB).
+ * @param isSandbox If the statistics are from a sandbox.
+ * @returns The statistics or null if not found.
+ */
+export async function getStatistics(
+    mongoDB: Db,
+    mongoIdentifier: string,
+    isSandbox: boolean
+): Promise<NsBot.IsStatistics | null> {
     try {
         const result = await mongoDB.collection("statistics").findOne({
-            _id: ObjectId.createFromHexString(statistics._id)
+            _id: ObjectId.createFromHexString(mongoIdentifier),
+            _isSandbox: isSandbox
         });
 
         if (result) {
-            logger.info("Statistics recovered from MongoDB.");
+            logger.verbose("Statistics recovered from the database.");
 
             return {
                 ...result,
                 _id: result._id.toString(),
-            };
+            } as NsBot.IsStatistics;
         } else {
-            logger.info("Statistics do not exist in MongoDB, sending them.");
-            await sendStatistics(mongoDB, statistics);
+            logger.error("Error while getting the statistics: Not found.");
 
-            return statistics;
+            return null;
         }
     } catch (error) {
-        logger.error(`Error while getting statistics from MongoDB:\n${error}.`);
-        return statistics;
+        logger.error(`Error while getting statistics from the database:\n${error}.`);
+        return null;
     }
 }

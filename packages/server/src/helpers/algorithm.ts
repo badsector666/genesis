@@ -1,1 +1,6 @@
-import * as exchangeWrapper from "helpers/exchange";
+import {} from "helpers/exchange";
+
+
+export function test() {
+    //
+}
