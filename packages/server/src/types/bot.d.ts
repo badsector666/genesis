@@ -26,13 +26,14 @@ declare namespace NsBot {
     interface IsStatistics {
         _id: string;
         _name: string;
-        _isSandbox: boolean;
+        _sandbox: boolean;
 
         _initTime: string;
-        _lastInitTime: string;
+        _lastStartTime: string;
         _lastStopTime: string;
         _lastStatsUpdate: string;
 
+        _timeframe: number;
         _tradingPair: string;
         _initialQuoteBalance: number;
 
@@ -61,13 +62,17 @@ declare namespace NsBot {
     interface IsBotData {
         _initialized: Promise<void>;
         _name: string;
-        _isSandbox: boolean;
+        _sandbox: boolean;
+
         _tradingPair: string;
+        _initialQuoteBalance: number;
+        _timeframe: number;
+
         _baseCurrency: string;
         _baseBalance: ccxt.Balance | null;
         _quoteCurrency: string;
         _quoteBalance: ccxt.Balance | null;
-        _initialQuoteBalance: number;
+
         _timeDifference: number;
     }
 }

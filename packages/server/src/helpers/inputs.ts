@@ -23,3 +23,40 @@ export function getUserInput(question: string): Promise<string> {
         });
     });
 }
+
+
+/**
+ * Get the time data in ms from a time string. (FATAL)
+ * These time strings are similar to the ones used on Binance Spot.
+ *
+ * Available timeframes:
+ * |     |     |
+ * |-----|-----|
+ * | 30s | 1m  |
+ * | 3m  | 5m  |
+ * | 15m | 30m |
+ * | 1h  | 2h  |
+ * | 4h  | 1d  |
+ *
+ * @param timeString The time string.
+ * @returns The time in ms.
+ */
+export function getTimeframe(timeString: string) {
+    const time = parseInt(timeString.slice(0, -1));
+    const timeframe = timeString.slice(-1);
+
+    switch (timeframe) {
+        case "s":
+            return time * 1000;
+        case "m":
+            return time * 60 * 1000;
+        case "h":
+            return time * 60 * 60 * 1000;
+        case "d":
+            return time * 24 * 60 * 60 * 1000;
+        default:
+            logger.error(`Invalid timeframe: ${timeframe}`);
+            logger.error("Available timeframes: 30s, 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 1d");
+            process.exit(1);
+    }
+}

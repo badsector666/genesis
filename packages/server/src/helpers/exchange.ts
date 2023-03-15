@@ -39,7 +39,7 @@ export function loadExchange(sandbox: boolean): ccxt.Exchange {
     exchange.setSandboxMode(sandbox);
 
     // Log the exchange information
-    logger.info(
+    logger.verbose(
         `${exchange.name} exchange loaded in ${sandbox ? "sandbox" : "production"} mode.`
     );
 
@@ -70,7 +70,7 @@ export async function checkExchangeStatus(exchange: ccxt.Exchange, fatal = true)
     // Log the status information
     const eta = status.eta ? new Date(status.eta).toLocaleString() : "N/A";
 
-    logger.info(`${exchange.name} status checked.`);
+    logger.info(`${exchange.name} status successfully checked.`);
     logger.verbose(`${exchange.name} status: ${status.status}, eta: ${eta}.`);
 
     // Fatal error if exchange is not reliable
@@ -94,7 +94,7 @@ export async function loadMarkets(exchange: ccxt.Exchange): Promise<ccxt.Diction
     const markets = await exchange.loadMarkets();
 
     // Log the market information
-    logger.info(`${exchange.name} markets loaded.`);
+    logger.verbose(`${exchange.name} markets loaded.`);
 
     return markets;
 }
@@ -108,7 +108,7 @@ export async function loadBalances(exchange: ccxt.Exchange): Promise<ccxt.Balanc
     const balances = await exchange.fetchBalance();
 
     // Log the balance information
-    logger.info(`${exchange.name} balances loaded.`);
+    logger.verbose(`${exchange.name} balances loaded.`);
 
     return balances;
 }

@@ -59,14 +59,12 @@ export async function closeDBConnection(mongoClient: MongoClient) {
  * Check if the statistics already exist in the database.
  * @param mongoDB The MongoDB database.
  * @param mongoIdentifier The bot identifier (objectID from MongoDB).
- * @param sandbox If the statistics are from a sandbox.
  * @returns If the statistics exist.
  */
-export async function checkStatistics(mongoDB: Db, mongoIdentifier: string, sandbox: boolean) {
+export async function checkStatistics(mongoDB: Db, mongoIdentifier: string) {
     try {
         const result = await mongoDB.collection("statistics").findOne({
-            _id: ObjectId.createFromHexString(mongoIdentifier),
-            _isSandbox: sandbox
+            _id: ObjectId.createFromHexString(mongoIdentifier)
         });
 
         if (result) {
@@ -112,14 +110,12 @@ export async function updateStatistics(mongoDB: Db, statistics: NsBot.IsStatisti
     try {
         const {
             _id,
-            _isSandbox,
             ...updateFields
         } = statistics;
 
         await mongoDB.collection("statistics").updateOne(
             {
-                _id: ObjectId.createFromHexString(_id),
-                _isSandbox: _isSandbox
+                _id: ObjectId.createFromHexString(_id)
             },
             {
                 $set: {
@@ -139,18 +135,15 @@ export async function updateStatistics(mongoDB: Db, statistics: NsBot.IsStatisti
  * Get statistics from the MongoDB database.
  * @param mongoDB The MongoDB database.
  * @param mongoIdentifier The bot identifier (objectID from MongoDB).
- * @param isSandbox If the statistics are from a sandbox.
  * @returns The statistics or null if not found.
  */
 export async function getStatistics(
     mongoDB: Db,
-    mongoIdentifier: string,
-    isSandbox: boolean
+    mongoIdentifier: string
 ): Promise<NsBot.IsStatistics | null> {
     try {
         const result = await mongoDB.collection("statistics").findOne({
-            _id: ObjectId.createFromHexString(mongoIdentifier),
-            _isSandbox: isSandbox
+            _id: ObjectId.createFromHexString(mongoIdentifier)
         });
 
         if (result) {

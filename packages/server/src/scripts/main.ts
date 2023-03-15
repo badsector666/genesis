@@ -2,8 +2,7 @@ import "configs/env";
 
 import Bot from "classes/bot";
 
-
-const bot = new Bot("MATIC/USDT", "Rompish", true, 20);
+const bot = new Bot("MATIC/USDT", "Rompish", true, 20, "1m");
 
 
 setTimeout(async () => {
