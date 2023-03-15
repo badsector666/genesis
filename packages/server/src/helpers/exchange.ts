@@ -1,7 +1,7 @@
 import ccxt from "ccxt";
 
 import { EXCHANGE_CONFIG } from "configs/global.config";
-import logger from "helpers/logger";
+import logger from "utils/logger";
 
 
 /**
@@ -258,7 +258,7 @@ export async function exchangeTimeDifference(exchange: ccxt.Exchange): Promise<n
     const timeDifference = serverTime - (localTime + Math.round(fetchTimeDelay));
 
     // Log the time information
-    logger.warn(`Difference between ${exchange.name} and local time: ${timeDifference}ms.`);
+    logger.verbose(`Difference between ${exchange.name} and local time: ${timeDifference}ms.`);
 
     return timeDifference;
 }

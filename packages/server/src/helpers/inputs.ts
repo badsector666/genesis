@@ -1,7 +1,18 @@
+import crypto from "crypto";
 import * as readline from "readline";
 
-import logger from "helpers/logger";
+import logger from "utils/logger";
 
+
+/**
+ * Encode a string to sha256 truncated to 24 character.
+ * @param input The input string.
+ * @returns The sha256 encoded string.
+ */
+export function sha256(input: string) {
+    const hash = crypto.createHash("sha256").update(input).digest("hex");
+    return hash.substring(0, 24);
+}
 
 /**
  * Asks the user for input and returns the answer.
@@ -26,22 +37,14 @@ export function getUserInput(question: string): Promise<string> {
 
 
 /**
- * Get the time data in ms from a time string. (FATAL)
+ * Get the time data in ms from a time string (FATAL).
  * These time strings are similar to the ones used on Binance Spot.
- *
- * Available timeframes:
- * |     |     |
- * |-----|-----|
- * | 30s | 1m  |
- * | 3m  | 5m  |
- * | 15m | 30m |
- * | 1h  | 2h  |
- * | 4h  | 1d  |
- *
  * @param timeString The time string.
  * @returns The time in ms.
  */
-export function getTimeframe(timeString: string) {
+export function getTimeframe(
+    timeString: "1s" | "30s" | "1m" | "3m" | "5m" | "15m" | "30m" | "1h" | "2h" | "4h" | "1d" = "1m"
+) {
     const time = parseInt(timeString.slice(0, -1));
     const timeframe = timeString.slice(-1);
 

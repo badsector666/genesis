@@ -13,18 +13,17 @@ import {
     loadMarkets,
     parseTradingPair
 } from "helpers/exchange";
-import { getTimeframe, getUserInput } from "helpers/inputs";
+import { getTimeframe, getUserInput, sha256 } from "helpers/inputs";
 import logger from "helpers/logger";
-import { sha256 } from "helpers/maths";
 import {
+    checkNetwork,
     checkStatistics,
     closeDBConnection,
     connectToDB,
     getStatistics,
     sendStatistics,
     updateStatistics
-} from "helpers/mongo";
-import { checkNetwork } from "helpers/network";
+} from "helpers/network";
 import NsBot from "types/bot";
 
 
@@ -100,6 +99,7 @@ export default class Bot {
 
         _name: "",                          // Bot name (used for statistics & converted to ObjectId)
         _sandbox: false,                    // Sandbox mode
+        _running: false,                    // If the bot is running
 
         _tradingPair: "",                   // Trading pair
         _initialQuoteBalance: 0,            // Initial quote balance
@@ -129,7 +129,7 @@ export default class Bot {
         name: string,
         sandbox = true,
         initialQuoteBalance = 0,
-        timeframe: "30s" | "1m" | "3m" | "5m" | "15m" | "30m" | "1h" | "2h" | "4h" | "1d" = "1m"
+        timeframe: "1s" | "30s" | "1m" | "3m" | "5m" | "15m" | "30m" | "1h" | "2h" | "4h" | "1d" = "1m"
     ) {
         // Sandbox mode overrides the trading pair
         // As most of currencies are not available in sandbox mode
@@ -141,7 +141,7 @@ export default class Bot {
         this._botData._tradingPair = tradingPair;
         logger.info(`New "${name}" bot instance for ${tradingPair} created.`);
         logger.info(`Sandbox mode: ${sandbox ? "enabled" : "disabled"}`);
-        logger.info(`Initial quote balance: ${initialQuoteBalance} ${tradingPair.split("/")[1]}`);
+        logger.info(`Initial quote balance: ${initialQuoteBalance} ${tradingPair.split("/")[ 1 ]}`);
         logger.info(`Timeframe: ${timeframe}`);
 
         // Parse the trading pair
@@ -302,10 +302,32 @@ export default class Bot {
     }
 
     /**
+     * The main loop of the bot.
+     */
+    private async _mainLoop() {
+        while (this._botData._running) {
+            console.log("test");
+
+            await new Promise(resolve => setTimeout(
+                resolve,
+                1000
+            ));
+        }
+    }
+
+    /**
      * Start the bot.
      */
     public async start() {
-        //
+        // Await the initialization
+        await this._botData._initialized;
+
+        // Main Loop
+        this._botData._running = true;
+
+        await Promise.all([
+            this._mainLoop()
+        ]);
     }
 
     /**
@@ -324,6 +346,8 @@ export default class Bot {
             await updateStatistics(this._mongoDB.mongoDB, this._statistics);
             await this._closeMongoDB();
         }
+
+        this._botData._running = false;
 
         // Log the bot stop
         logger.info("Bot stopped.");

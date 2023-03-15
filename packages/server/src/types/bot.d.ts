@@ -63,6 +63,7 @@ declare namespace NsBot {
         _initialized: Promise<void>;
         _name: string;
         _sandbox: boolean;
+        _running: boolean;
 
         _tradingPair: string;
         _initialQuoteBalance: number;

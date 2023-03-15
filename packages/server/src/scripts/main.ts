@@ -2,12 +2,13 @@ import "configs/env";
 
 import Bot from "classes/bot";
 
-const bot = new Bot("MATIC/USDT", "Rompish", true, 20, "1m");
+const bot = new Bot("MATIC/USDT", "Rompish", true, 20, "1s");
 
+bot.start();
 
 setTimeout(async () => {
     await bot.stop();
-}, 5000); // 5000 milliseconds = 5 seconds
+}, 60000); // 5000 milliseconds = 5 seconds
 
 
 

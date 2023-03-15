@@ -11,10 +11,10 @@ export const GENERAL_CONFIG = {
 export const NETWORK_CONFIG = {
     checkNetwork: true,
     checkNetworkInterval: 1000 * 60 * 60 * 24,  // 1 day
-    jitterLimit: 5,  // ms
-    latencyLimit: 100,  // ms
-    downloadLimit: 1,  // Mo/s
-    uploadLimit: 1  // Mo/s
+    jitterLimit: 5,                             // ms
+    latencyLimit: 100,                          // ms
+    downloadLimit: 1,                           // Mo/s
+    uploadLimit: 1                              // Mo/s
 };
 
 /**
