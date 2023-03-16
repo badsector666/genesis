@@ -1,6 +1,7 @@
 import "configs/env";
 
 import Bot from "classes/bot";
+import { getProcessUsage } from "utils/performances";
 
 const bot = new Bot("MATIC/USDT", "Rompish", true, 20, "1s");
 
@@ -8,8 +9,11 @@ bot.start();
 
 setTimeout(async () => {
     await bot.stop();
-}, 60000); // 5000 milliseconds = 5 seconds
+}, 5000);
 
+// getProcessUsage().then((usage) => {
+//     console.log(usage);
+// });
 
 
 // import {

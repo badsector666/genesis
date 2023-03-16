@@ -1,9 +1,10 @@
 import date from "date-and-time";
 import { ObjectId } from "mongodb";
 
+import { botData, botStats } from "configs/defaults.config";
 import { EXCHANGE_CONFIG } from "configs/global.config";
 import {
-} from "helpers/algorithm";
+} from "utils/algorithm";
 import {
     checkExchangeStatus,
     exchangeTimeDifference,
@@ -14,7 +15,6 @@ import {
     parseTradingPair
 } from "helpers/exchange";
 import { getTimeframe, getUserInput, sha256 } from "helpers/inputs";
-import logger from "helpers/logger";
 import {
     checkNetwork,
     checkStatistics,
@@ -25,6 +25,8 @@ import {
     updateStatistics
 } from "helpers/network";
 import NsBot from "types/bot";
+import NsBotStats from "types/botStats";
+import logger from "utils/logger";
 
 
 export default class Bot {
@@ -49,69 +51,12 @@ export default class Bot {
      * Note that statistics should never be used as input for the bot,
      * but rather as a way to track the bot's performance.
      */
-    private _statistics: NsBot.IsStatistics = {
-        // Bot
-        _id: "",                            // Bot identifier (MongoDB objectID)
-        _name: "",                          // Bot name (used for statistics & converted to ObjectId)
-        _sandbox: false,                    // Sandbox mode
-
-        // Timestamps
-        _initTime: "",                      // First initialization time
-        _lastStartTime: "",                 // Last start time
-        _lastStopTime: "",                  // Last stop time
-        _lastStatsUpdate: "",               // Last statistics update time
-
-        // Trading Config
-        _timeframe: 0,                      // Timeframe  (in ms)
-        _tradingPair: "",                   // Trading pair
-        _initialQuoteBalance: 0,            // Initial quote balance to start with
-
-        // General trading statistics
-        _tradeSuccessRate: 0,               // Trade success rate (in %)
-        _maxDrawdown: 0,                    // Maximum drawdown (max loss in %)
-        _maxConsecutiveWins: 0,             // Maximum consecutive wins
-        _maxConsecutiveLosses: 0,           // Maximum consecutive losses
-
-        // Total trading statistics
-        _totalTrades: 0,                    // Number of total trades
-        _totalTradesWon: 0,                 // Number of total trades won
-        _totalTradesLost: 0,                // Number of total trades lost
-        _totalTradeVolume: 0,               // Total trade volume (in quote currency)
-        _totalFees: 0,                      // Total fees (in quote currency)
-        _totalProfit: 0,                    // Total profit (in quote currency)
-
-        // Average trading statistics
-        _avgTradeSize: 0,                   // Average trade size (in quote currency)
-        _avgTradeDuration: 0,               // Average trade duration (in seconds)
-        _avgTradeProfit: 0,                 // Average trade profit (in quote currency)
-        _avgFeePerTrade: 0,                 // Average fee per trade (in quote currency)
-        _avgDailyProfitPercentage: 0        // Average daily profit percentage (in %)
-    };
+    private _statistics = botStats;
 
     /**
      * Bot data.
      */
-    private _botData: NsBot.IsBotData = {
-        // Promise to wait for the bot to be initialized
-        _initialized: new Promise<void>((resolved) => {
-            resolved();
-        }),
-
-        _name: "",                          // Bot name (used for statistics & converted to ObjectId)
-        _sandbox: false,                    // Sandbox mode
-        _running: false,                    // If the bot is running
-
-        _tradingPair: "",                   // Trading pair
-        _initialQuoteBalance: 0,            // Initial quote balance
-        _timeframe: 0,                      // Timeframe (in ms)
-
-        _baseCurrency: "",                  // Base currency
-        _baseBalance: null,                 // Base currency balance
-        _quoteCurrency: "",                 // Quote currency
-        _quoteBalance: null,                // Quote currency balance
-
-        _timeDifference: 0                  // Time difference between the exchange and the bot
-    };
+    private _botData = botData;
 
 
     /**
@@ -182,21 +127,22 @@ export default class Bot {
     private async _statisticsHandler() {
         if (this._mongoDB.mongoDB) {
             const time = date.format(new Date(), "YYYY-MM-DD HH:mm:ss");
-            const ID = this._getObjectId(
-                this._botData._sandbox, this._botData._name);
+            const ID = this._getObjectId(this._botData._sandbox, this._botData._name);
 
             // Check if the statistics are already in the database
             const botStatisticsState = await checkStatistics(this._mongoDB.mongoDB, ID);
 
             if (!botStatisticsState) {
                 this._statistics._id = ID;
-                this._statistics._name = this._botData._name;
-                this._statistics._initTime = time;
-                this._statistics._lastStartTime = time;
-                this._statistics._sandbox = this._botData._sandbox;
-                this._statistics._tradingPair = this._botData._tradingPair;
-                this._statistics._initialQuoteBalance = this._botData._initialQuoteBalance;
-                this._statistics._timeframe = this._botData._timeframe;
+                this._statistics._botInfo._name = this._botData._name;
+                this._statistics._botInfo._sandbox = this._botData._sandbox;
+
+                this._statistics._timestamps._initTime = time;
+                this._statistics._timestamps._lastStartTime = time;
+
+                this._statistics._botParams._timeframe = this._botData._timeframe;
+                this._statistics._botParams._tradingPair = this._botData._tradingPair;
+                this._statistics._botParams._initialQuoteBalance = this._botData._initialQuoteBalance;
 
                 await sendStatistics(this._mongoDB.mongoDB, this._statistics);
             } else {
@@ -207,9 +153,9 @@ export default class Bot {
                 }
 
                 // Bypass the recovery from the database for certain statistics
-                this._statistics._lastStartTime = time;
-                this._statistics._initialQuoteBalance = this._botData._initialQuoteBalance;
-                this._statistics._timeframe = this._botData._timeframe;
+                this._statistics._timestamps._lastStartTime = time;
+                this._statistics._botParams._initialQuoteBalance = this._botData._initialQuoteBalance;
+                this._statistics._botParams._timeframe = this._botData._timeframe;
             }
         }
     }
@@ -340,7 +286,7 @@ export default class Bot {
         const time = date.format(new Date(), "YYYY-MM-DD HH:mm:ss");
 
         // Update the statistics
-        this._statistics._lastStopTime = time;
+        this._statistics._timestamps._lastStopTime = time;
 
         if (this._mongoDB.mongoDB) {
             await updateStatistics(this._mongoDB.mongoDB, this._statistics);

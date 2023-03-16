@@ -35,7 +35,6 @@ export function getUserInput(question: string): Promise<string> {
     });
 }
 
-
 /**
  * Get the time data in ms from a time string (FATAL).
  * These time strings are similar to the ones used on Binance Spot.

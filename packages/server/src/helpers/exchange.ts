@@ -128,8 +128,6 @@ export function getBalance(balances: ccxt.Balances, token: string): ccxt.Balance
     return balance;
 }
 
-
-
 /**
  * Fetch the latest ticker data by trading symbol.
  * @param exchange The exchange.

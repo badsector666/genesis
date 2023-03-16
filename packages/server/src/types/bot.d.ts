@@ -21,42 +21,6 @@ declare namespace NsBot {
     }
 
     /**
-     * Statistics.
-     */
-    interface IsStatistics {
-        _id: string;
-        _name: string;
-        _sandbox: boolean;
-
-        _initTime: string;
-        _lastStartTime: string;
-        _lastStopTime: string;
-        _lastStatsUpdate: string;
-
-        _timeframe: number;
-        _tradingPair: string;
-        _initialQuoteBalance: number;
-
-        _tradeSuccessRate: number;
-        _maxDrawdown: number;
-        _maxConsecutiveWins: number;
-        _maxConsecutiveLosses: number;
-
-        _totalTrades: number;
-        _totalTradesWon: number;
-        _totalTradesLost: number;
-        _totalTradeVolume: number;
-        _totalFees: number;
-        _totalProfit: number;
-
-        _avgTradeSize: number;
-        _avgTradeDuration: number;
-        _avgTradeProfit: number;
-        _avgFeePerTrade: number;
-        _avgDailyProfitPercentage: number;
-    }
-
-    /**
      * Bot data.
      */
     interface IsBotData {

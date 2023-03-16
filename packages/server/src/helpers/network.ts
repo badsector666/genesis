@@ -3,7 +3,7 @@ import { Db, MongoClient, ObjectId } from "mongodb";
 import speedTest from "speedtest-net";
 
 import { NETWORK_CONFIG } from "configs/global.config";
-import NsBot from "types/bot";
+import NsBotStats from "types/botStats";
 import logger from "utils/logger";
 
 
@@ -174,7 +174,7 @@ export async function checkStatistics(mongoDB: Db, mongoIdentifier: string) {
  * @param mongoDB The MongoDB database.
  * @param statistics The statistics.
  */
-export async function sendStatistics(mongoDB: Db, statistics: NsBot.IsStatistics) {
+export async function sendStatistics(mongoDB: Db, statistics: NsBotStats.IsBotStats) {
     try {
         await mongoDB.collection("statistics").insertOne({
             ...statistics,
@@ -193,12 +193,16 @@ export async function sendStatistics(mongoDB: Db, statistics: NsBot.IsStatistics
  * @param statistics The statistics.
  * @param update If the statistics should be updated.
  */
-export async function updateStatistics(mongoDB: Db, statistics: NsBot.IsStatistics) {
+export async function updateStatistics(mongoDB: Db, statistics: NsBotStats.IsBotStats) {
     try {
         const {
             _id,
+            _timestamps,
             ...updateFields
         } = statistics;
+
+        // Update the last update timestamp
+        _timestamps._lastStatsUpdate = date.format(new Date(), "YYYY-MM-DD HH:mm:ss");
 
         await mongoDB.collection("statistics").updateOne(
             {
@@ -207,7 +211,7 @@ export async function updateStatistics(mongoDB: Db, statistics: NsBot.IsStatisti
             {
                 $set: {
                     ...updateFields,
-                    _lastStatsUpdate: date.format(new Date(), "YYYY-MM-DD HH:mm:ss")
+                    _timestamps
                 }
             }
         );
@@ -227,7 +231,7 @@ export async function updateStatistics(mongoDB: Db, statistics: NsBot.IsStatisti
 export async function getStatistics(
     mongoDB: Db,
     mongoIdentifier: string
-): Promise<NsBot.IsStatistics | null> {
+): Promise<NsBotStats.IsBotStats | null> {
     try {
         const result = await mongoDB.collection("statistics").findOne({
             _id: ObjectId.createFromHexString(mongoIdentifier)
@@ -236,10 +240,31 @@ export async function getStatistics(
         if (result) {
             logger.verbose("Statistics recovered from the database.");
 
+            const _id = result._botInfo._id.toString();
+
+            const _botInfo = {
+                ...result._botInfo
+            } as NsBotStats.IsBotInfo;
+
+            const _timestamps = {
+                ...result._timestamps
+            } as NsBotStats.IsTimestamps;
+
+            const _botParams = {
+                ...result._botParams
+            } as NsBotStats.IsBotParams;
+
+            const _tradeStats = {
+                ...result._tradeStats
+            } as NsBotStats.IsTradeStats;
+
             return {
-                ...result,
-                _id: result._id.toString(),
-            } as NsBot.IsStatistics;
+                _id: _id,
+                _botInfo: _botInfo,
+                _timestamps: _timestamps,
+                _botParams: _botParams,
+                _tradeStats: _tradeStats
+            } as NsBotStats.IsBotStats;
         } else {
             logger.error("Error while getting the statistics: Not found.");
 
