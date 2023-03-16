@@ -2,6 +2,9 @@ declare namespace NsBotStats {
     interface IsBotInfo {
         _name: string;
         _sandbox: boolean;
+        _generalIterations: number;
+        _mainIterations: number;
+        _mainTimeframeCorrector: number;
     }
 
     interface IsPlatformInfo {

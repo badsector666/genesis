@@ -8,6 +8,9 @@ export const botStats: NsBotStats.IsBotStats = {
     _botInfo: {
         _name: "",                          // Bot name (used for statistics & converted to ObjectId)
         _sandbox: false,                    // Sandbox mode
+        _generalIterations: 0,              // Number of general iterations
+        _mainIterations: 0,                 // Number of main iterations
+        _mainTimeframeCorrector: 0,         // Last recorded timeframe corrector for main iterations (in ms)
     },
     _timestamps: {
         _initTime: "",                      // First initialization time

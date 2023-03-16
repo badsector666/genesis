@@ -35,6 +35,14 @@ either to ensure its good function, or to recover initial data.
 - Check the existence of these balances.
 - Handle the statistics with the database (create new ones or recover existing ones for an ID).
 
+Loop system
+-----------
+The bot runs with two `Promise` loops, one is the main used for the orders, algorithms etc..
+the other one is the general one, used for statistics & other data update.
+
+It's important to note that the main loop iteration internal time is measured using `performance.now()`,
+so the internal time is subtracted to the final timeframe for a better precision.
+
 Bot statistics
 --------------
 The statistics are stored inside a MongoDB database, the identifier set when creating

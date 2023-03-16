@@ -2,7 +2,8 @@
  * General configuration.
  */
 export const GENERAL_CONFIG = {
-    verbose: true
+    verbose: true,                          // Set the winston logger to verbose mode
+    timeframeFactorForGeneralLoop: 2        // The timeframe factor for the general loop (x2 by default)
 };
 
 /**

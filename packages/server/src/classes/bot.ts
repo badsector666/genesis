@@ -1,7 +1,7 @@
 import date from "date-and-time";
 
 import { botData, botStats } from "configs/defaults.config";
-import { EXCHANGE_CONFIG } from "configs/global.config";
+import { EXCHANGE_CONFIG, GENERAL_CONFIG } from "configs/global.config";
 import {
 } from "utils/algorithm";
 import {
@@ -88,7 +88,7 @@ export default class Bot {
         this._botData._tradingPair = tradingPair;
         logger.info(`New "${name}" bot instance for ${tradingPair} created.`);
         logger.info(`Sandbox mode: ${sandbox ? "enabled" : "disabled"}`);
-        logger.info(`Initial quote balance: ${initialQuoteBalance} ${tradingPair.split("/")[ 1 ]}`);
+        logger.info(`Initial quote balance: ${initialQuoteBalance} ${tradingPair.split("/")[1]}`);
         logger.info(`Timeframe: ${timeframe}`);
 
         // Parse the trading pair
@@ -236,16 +236,48 @@ export default class Bot {
     }
 
     /**
+     * General loop of the bot (no precision corrector).
+     * Used for the statistics update and other data collections.
+     */
+    private async _generalLoop() {
+        while (this._botData._running) {
+
+
+            // Statistics
+            this._statistics._botInfo._generalIterations += 1;
+
+            // Update the statistics
+            if (this._mongoDB.mongoDB) {
+                await updateStatistics(this._mongoDB.mongoDB, this._statistics);
+            }
+
+            await new Promise(resolve => setTimeout(
+                resolve,
+                this._botData._timeframe * GENERAL_CONFIG.timeframeFactorForGeneralLoop
+            ));
+        }
+    }
+
+    /**
      * The main loop of the bot.
      */
     private async _mainLoop() {
         while (this._botData._running) {
-            console.log("test");
+            let timeframeCorrector = performance.now();
+
+            console.log("PUTE");
+
+            timeframeCorrector = performance.now() - timeframeCorrector;
+
+            // Statistics
+            this._statistics._botInfo._mainIterations += 1;
+            this._statistics._botInfo._mainTimeframeCorrector = timeframeCorrector;
 
             await new Promise(resolve => setTimeout(
                 resolve,
-                1000
+                this._botData._timeframe - timeframeCorrector
             ));
+
         }
     }
 
@@ -260,6 +292,7 @@ export default class Bot {
         this._botData._running = true;
 
         await Promise.all([
+            this._generalLoop(),
             this._mainLoop()
         ]);
     }
