@@ -1,6 +1,8 @@
 import crypto from "crypto";
 import * as readline from "readline";
 
+import { ObjectId } from "mongodb";
+
 import logger from "utils/logger";
 
 
@@ -13,6 +15,21 @@ export function sha256(input: string) {
     const hash = crypto.createHash("sha256").update(input).digest("hex");
     return hash.substring(0, 24);
 }
+
+/**
+ * Get the MongoDB object ID from the bot name.
+ * @param sandbox If the bot is running in sandbox mode.
+ * @param name The bot name.
+ * @returns The MongoDB object ID.
+ */
+export function getObjectId(sandbox: boolean, name: string) {
+    const ID = sha256(
+        sandbox ? `${name}-sandbox` : name
+    );
+
+    return ObjectId.createFromHexString(ID).toString("hex");
+}
+
 
 /**
  * Asks the user for input and returns the answer.

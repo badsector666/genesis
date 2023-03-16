@@ -1,5 +1,4 @@
 import date from "date-and-time";
-import { ObjectId } from "mongodb";
 
 import { botData, botStats } from "configs/defaults.config";
 import { EXCHANGE_CONFIG } from "configs/global.config";
@@ -14,7 +13,11 @@ import {
     loadMarkets,
     parseTradingPair
 } from "helpers/exchange";
-import { getTimeframe, getUserInput, sha256 } from "helpers/inputs";
+import {
+    getObjectId,
+    getTimeframe,
+    getUserInput
+} from "helpers/inputs";
 import {
     checkNetwork,
     checkStatistics,
@@ -25,7 +28,6 @@ import {
     updateStatistics
 } from "helpers/network";
 import NsBot from "types/bot";
-import NsBotStats from "types/botStats";
 import logger from "utils/logger";
 
 
@@ -106,20 +108,6 @@ export default class Bot {
 
 
     /**
-     * Get the MongoDB object ID from the bot name.
-     * @param sandbox If the bot is running in sandbox mode.
-     * @param name The bot name.
-     * @returns The MongoDB object ID.
-     */
-    private _getObjectId(sandbox: boolean, name: string) {
-        const ID = sha256(
-            sandbox ? `${name}-sandbox` : name
-        );
-
-        return ObjectId.createFromHexString(ID).toString("hex");
-    }
-
-    /**
      * Generate statistics if not found in MongoDB,
      * otherwise recover and update the local statistics.
      * @returns The statistics (local or from the database).
@@ -127,7 +115,7 @@ export default class Bot {
     private async _statisticsHandler() {
         if (this._mongoDB.mongoDB) {
             const time = date.format(new Date(), "YYYY-MM-DD HH:mm:ss");
-            const ID = this._getObjectId(this._botData._sandbox, this._botData._name);
+            const ID = getObjectId(this._botData._sandbox, this._botData._name);
 
             // Check if the statistics are already in the database
             const botStatisticsState = await checkStatistics(this._mongoDB.mongoDB, ID);
