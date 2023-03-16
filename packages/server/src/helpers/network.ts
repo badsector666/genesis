@@ -240,7 +240,7 @@ export async function getStatistics(
         if (result) {
             logger.verbose("Statistics recovered from the database.");
 
-            const _id = result._botInfo._id.toString();
+            const _id = result._id.toString();
 
             const _botInfo = {
                 ...result._botInfo
