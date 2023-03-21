@@ -1,8 +1,10 @@
 import crypto from "crypto";
 import * as readline from "readline";
 
+import date from "date-and-time";
 import { ObjectId } from "mongodb";
 
+import { GENERAL_CONFIG } from "configs/global.config";
 import logger from "utils/logger";
 
 
@@ -78,4 +80,12 @@ export function getTimeframe(
             logger.error("Available timeframes: 30s, 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 1d");
             process.exit(1);
     }
+}
+
+/**
+ * Get the current date string.
+ * @returns The current date string.
+ */
+export function getCurrentDateString() {
+    return date.format(new Date(), GENERAL_CONFIG.dateFormat);
 }

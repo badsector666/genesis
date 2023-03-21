@@ -90,13 +90,11 @@ export async function checkExchangeStatus(exchange: ccxt.Exchange, fatal = true)
  * @param exchange The exchange.
  * @returns The markets.
  */
-export async function loadMarkets(exchange: ccxt.Exchange): Promise<ccxt.Dictionary<ccxt.Market>> {
-    const markets = await exchange.loadMarkets();
+export async function loadMarkets(exchange: ccxt.Exchange): Promise<void> {
+    await exchange.loadMarkets();
 
     // Log the market information
     logger.verbose(`${exchange.name} markets loaded.`);
-
-    return markets;
 }
 
 /**

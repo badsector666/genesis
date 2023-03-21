@@ -1,9 +1,9 @@
-import date from "date-and-time";
 import { Db, MongoClient, ObjectId } from "mongodb";
 import speedTest from "speedtest-net";
 
 import { NETWORK_CONFIG } from "configs/global.config";
-import NsBotStats from "types/botStats";
+import { getCurrentDateString } from "helpers/inputs";
+import NsBot from "types/bot";
 import logger from "utils/logger";
 
 
@@ -143,135 +143,149 @@ export async function closeDBConnection(mongoClient: MongoClient) {
 }
 
 /**
- * Check if the statistics already exist in the database.
+ * Check if the bot object already exists in the database.
  * @param mongoDB The MongoDB database.
- * @param mongoIdentifier The bot identifier (objectID from MongoDB).
+ * @param botIdentifier The bot object identifier (objectID from MongoDB).
  * @returns If the statistics exist.
  */
-export async function checkStatistics(mongoDB: Db, mongoIdentifier: string) {
+async function checkBotObjectExistenceInDB(mongoDB: Db, botIdentifier: string) {
     try {
-        const result = await mongoDB.collection("statistics").findOne({
-            _id: ObjectId.createFromHexString(mongoIdentifier)
+        const result = await mongoDB.collection(NETWORK_CONFIG.database).findOne({
+            _id: ObjectId.createFromHexString(botIdentifier)
         });
 
         if (result) {
-            logger.verbose("Statistics for this bot found inside the database.");
+            logger.verbose("Object for this bot found inside the database.");
 
             return true;
         } else {
-            logger.verbose("Statistics for this bot do not exist inside the database.");
+            logger.verbose("Object for this bot do not exist inside the database.");
 
             return false;
         }
     } catch (error) {
-        logger.error(`Error while checking statistics from the database:\n${error}.`);
+        logger.error(`Error while checking the object existence inside the database:\n${error}.`);
         return false;
     }
 }
 
 /**
- * Send statistics to the MongoDB database.
+ * Send the initial bot object to the database.
  * @param mongoDB The MongoDB database.
- * @param statistics The statistics.
+ * @param botObject The bot object.
  */
-export async function sendStatistics(mongoDB: Db, statistics: NsBotStats.IsBotStats) {
+async function sendInitialBotObjectToDB(mongoDB: Db, botObject: NsBot.IsBotObject) {
     try {
-        await mongoDB.collection("statistics").insertOne({
-            ...statistics,
-            _id: new ObjectId(statistics._id)
+        // Handle init time special
+        botObject.specials.initTime = getCurrentDateString();
+
+        await mongoDB.collection(NETWORK_CONFIG.database).insertOne({
+            _id: ObjectId.createFromHexString(botObject.started.id),
+            started: botObject.started,
+            stopped: botObject.stopped,
+            stats: botObject.stats,
+            specials: botObject.specials,
         });
 
-        logger.verbose("Statistics sent to the database.");
+        logger.verbose("Initial bot object successfully sent to the database.");
     } catch (error) {
-        logger.error(`Error while sending statistics to the database:\n${error}.`);
+        logger.error(`Error while sending initial bot object to the database:\n${error}.`);
     }
 }
 
 /**
- * Update the statistics inside the MongoDB database.
+ * Get the bot object from the database.
+ * Note that it also recovers the specials object.
  * @param mongoDB The MongoDB database.
- * @param statistics The statistics.
- * @param update If the statistics should be updated.
+ * @param botObject The bot object.
+ * @returns The bot object with stat vars recovered from database.
  */
-export async function updateStatistics(mongoDB: Db, statistics: NsBotStats.IsBotStats) {
+async function getBotObjectFromDB(
+    mongoDB: Db,
+    botObject: NsBot.IsBotObject
+): Promise<NsBot.IsBotObject | null> {
     try {
-        const {
-            _id,
-            _timestamps,
-            ...updateFields
-        } = statistics;
+        const res = await mongoDB.collection(NETWORK_CONFIG.database).findOne({
+            _id: ObjectId.createFromHexString(botObject.started.id)
+        });
 
-        // Update the last update timestamp
-        _timestamps._lastStatsUpdate = date.format(new Date(), "YYYY-MM-DD HH:mm:ss");
+        if (res) {
+            logger.verbose("Bot object successfully retrieved from the database.");
 
-        await mongoDB.collection("statistics").updateOne(
+            // Get the stats object (and specials object)
+            botObject.stats = res.stats as NsBot.IsBotObjectStats;
+            botObject.specials = res.specials as NsBot.IsBotObjectSpecials;
+
+            return botObject;
+        } else {
+            logger.error("Error while retrieving bot object from the database.");
+            return null;
+        }
+    } catch (error) {
+        logger.error(`Error while retrieving bot object from the database:\n${error}.`);
+        return null;
+    }
+}
+
+/**
+ * Send or get the bot object to/from the database.
+ * @param mongoDB The MongoDB database.
+ * @param botObject The bot object.
+ * @returns Either the DB object or the unmodified passed bot object.
+ */
+export async function sendOrGetInitialBotObject(mongoDB: Db, botObject: NsBot.IsBotObject) {
+    // Check if the bot object already exists in the database
+    const existence = await checkBotObjectExistenceInDB(mongoDB, botObject.started.id);
+
+    if (existence) {
+        // Get the bot object from the database
+        const res = await getBotObjectFromDB(mongoDB, botObject);
+
+        if (res) {
+            return res;
+        } else {
+            // Return the unmodified bot object in case of error
+            return botObject;
+        }
+    } else {
+        // Send the initial bot object to the database
+        await sendInitialBotObjectToDB(mongoDB, botObject);
+
+        // Return the unmodified bot object
+        return botObject;
+    }
+}
+
+/**
+ * Updates different categories of the bot object (started, stopped or stats).
+ * Note that it also updates the specials category.
+ *
+ * @param mongoDB The MongoDB database.
+ * @param botObject The bot object.
+ */
+export async function sendBotObjectCategory(
+    mongoDB: Db,
+    botObject: NsBot.IsBotObject,
+    category: "started" | "stopped" | "stats"
+) {
+    try {
+        // Handle last stats update special
+        botObject.specials.lastStatsUpdate = getCurrentDateString();
+
+        await mongoDB.collection(NETWORK_CONFIG.database).updateOne(
             {
-                _id: ObjectId.createFromHexString(_id)
+                _id: ObjectId.createFromHexString(botObject.started.id)
             },
             {
                 $set: {
-                    ...updateFields,
-                    _timestamps
+                    [category]: botObject[category],
+                    specials: botObject.specials
                 }
             }
         );
 
-        logger.verbose("Statistics updated into the database.");
+        logger.verbose(`Bot object '${category}' category successfully sent to the database.`);
     } catch (error) {
-        logger.error(`Error while updating statistics to database:\n${error}.`);
-    }
-}
-
-/**
- * Get statistics from the MongoDB database.
- * @param mongoDB The MongoDB database.
- * @param mongoIdentifier The bot identifier (objectID from MongoDB).
- * @returns The statistics or null if not found.
- */
-export async function getStatistics(
-    mongoDB: Db,
-    mongoIdentifier: string
-): Promise<NsBotStats.IsBotStats | null> {
-    try {
-        const result = await mongoDB.collection("statistics").findOne({
-            _id: ObjectId.createFromHexString(mongoIdentifier)
-        });
-
-        if (result) {
-            logger.verbose("Statistics recovered from the database.");
-
-            const _id = result._id.toString();
-
-            const _botInfo = {
-                ...result._botInfo
-            } as NsBotStats.IsBotInfo;
-
-            const _timestamps = {
-                ...result._timestamps
-            } as NsBotStats.IsTimestamps;
-
-            const _botParams = {
-                ...result._botParams
-            } as NsBotStats.IsBotParams;
-
-            const _tradeStats = {
-                ...result._tradeStats
-            } as NsBotStats.IsTradeStats;
-
-            return {
-                _id: _id,
-                _botInfo: _botInfo,
-                _timestamps: _timestamps,
-                _botParams: _botParams,
-                _tradeStats: _tradeStats
-            } as NsBotStats.IsBotStats;
-        } else {
-            logger.error("Error while getting the statistics: Not found.");
-
-            return null;
-        }
-    } catch (error) {
-        logger.error(`Error while getting statistics from the database:\n${error}.`);
-        return null;
+        logger.error(`Error while sending bot object '${category}' category to the database:\n${error}.`);
     }
 }

@@ -1,6 +1,7 @@
-import date from "date-and-time";
+import ccxt from "ccxt";
+import { Db } from "mongodb";
 
-import { botData, botStats } from "configs/defaults.config";
+import { botObject } from "configs/defaults.config";
 import { EXCHANGE_CONFIG, GENERAL_CONFIG } from "configs/global.config";
 import {
 } from "utils/algorithm";
@@ -14,51 +15,28 @@ import {
     parseTradingPair
 } from "helpers/exchange";
 import {
+    getCurrentDateString,
     getObjectId,
     getTimeframe,
     getUserInput
 } from "helpers/inputs";
 import {
     checkNetwork,
-    checkStatistics,
     closeDBConnection,
     connectToDB,
-    getStatistics,
-    sendStatistics,
-    updateStatistics
+    sendBotObjectCategory,
+    sendOrGetInitialBotObject
 } from "helpers/network";
 import NsBot from "types/bot";
 import logger from "utils/logger";
 
 
 export default class Bot {
-    // Local Vars
-    private _networkStatus = false;
+    private _botObject = botObject;
     private _mongoDB: NsBot.IsMongoDB = {
         mongoClient: null,
         mongoDB: null
     };
-
-    // Interfaces
-    private _exchangeData: NsBot.IsExchangeData = {
-        // Raw exchange obj and balances from ccxt
-        _exchange: null,
-        _balances: null
-    };
-
-    /**
-     * Statistics.
-     * Sent to the MongoDB database.
-     *
-     * Note that statistics should never be used as input for the bot,
-     * but rather as a way to track the bot's performance.
-     */
-    private _statistics = botStats;
-
-    /**
-     * Bot data.
-     */
-    private _botData = botData;
 
 
     /**
@@ -84,85 +62,38 @@ export default class Bot {
             tradingPair = EXCHANGE_CONFIG.sandboxTradingPair;
         }
 
-        // Set the trading pair
-        this._botData._tradingPair = tradingPair;
+        // Bot static parameters
+        this._botObject.started.name = name;
+        this._botObject.started.id = getObjectId(sandbox, name);
+        this._botObject.started.sandbox = sandbox;
+
+        // Trading pair
+        const tokens = parseTradingPair(tradingPair);
+        this._botObject.started.tradingPair = tradingPair;
+        this._botObject.started.baseCurrency = tokens.base;
+        this._botObject.started.quoteCurrency = tokens.quote;
+        this._botObject.started.initialQuoteBalance = initialQuoteBalance;
+
+        // Timestamps
+        this._botObject.started.timeframe = getTimeframe(timeframe);
+
+        // Logging
         logger.info(`New "${name}" bot instance for ${tradingPair} created.`);
         logger.info(`Sandbox mode: ${sandbox ? "enabled" : "disabled"}`);
         logger.info(`Initial quote balance: ${initialQuoteBalance} ${tradingPair.split("/")[1]}`);
         logger.info(`Timeframe: ${timeframe}`);
 
-        // Parse the trading pair
-        const tokens = parseTradingPair(tradingPair);
-        this._botData._baseCurrency = tokens.base;
-        this._botData._quoteCurrency = tokens.quote;
-
-        // Bot static parameters
-        this._botData._name = name;
-        this._botData._sandbox = sandbox;
-        this._botData._initialQuoteBalance = initialQuoteBalance;
-        this._botData._timeframe = getTimeframe(timeframe);
-
         // Initialize the bot
-        this._botData._initialized = this._initialize();
+        this._botObject.local.initialized = this._initialize();
     }
 
-
-    /**
-     * Generate statistics if not found in MongoDB,
-     * otherwise recover and update the local statistics.
-     * @returns The statistics (local or from the database).
-     */
-    private async _statisticsHandler() {
-        if (this._mongoDB.mongoDB) {
-            const time = date.format(new Date(), "YYYY-MM-DD HH:mm:ss");
-            const ID = getObjectId(this._botData._sandbox, this._botData._name);
-
-            // Check if the statistics are already in the database
-            const botStatisticsState = await checkStatistics(this._mongoDB.mongoDB, ID);
-
-            if (!botStatisticsState) {
-                this._statistics._id = ID;
-                this._statistics._botInfo._name = this._botData._name;
-                this._statistics._botInfo._sandbox = this._botData._sandbox;
-
-                this._statistics._timestamps._initTime = time;
-                this._statistics._timestamps._lastStartTime = time;
-
-                this._statistics._botParams._timeframe = this._botData._timeframe;
-                this._statistics._botParams._tradingPair = this._botData._tradingPair;
-                this._statistics._botParams._initialQuoteBalance = this._botData._initialQuoteBalance;
-
-                await sendStatistics(this._mongoDB.mongoDB, this._statistics);
-            } else {
-                const tempStats = await getStatistics(this._mongoDB.mongoDB, ID);
-
-                if (tempStats) {
-                    this._statistics = tempStats;
-                }
-
-                // Bypass the recovery from the database for certain statistics
-                this._statistics._timestamps._lastStartTime = time;
-                this._statistics._botParams._initialQuoteBalance = this._botData._initialQuoteBalance;
-                this._statistics._botParams._timeframe = this._botData._timeframe;
-            }
-        }
-    }
-
-    /**
-     * Close the MongoDB connection.
-     */
-    private async _closeMongoDB() {
-        if (this._mongoDB && this._mongoDB.mongoClient) {
-            await closeDBConnection(this._mongoDB.mongoClient);
-        }
-    }
 
     /**
      * Initialize the bot.
      */
     private async _initialize() {
         // Real mode warning with user input (FATAL)
-        if (!this._botData._sandbox) {
+        if (!this._botObject.started.sandbox) {
             const answer = await getUserInput(
                 "Sandbox mode is disabled! Would you like to continue? (y/n)"
             );
@@ -173,62 +104,65 @@ export default class Bot {
             }
         }
 
-        // Check the network status (FATAL)
-        if (!this._botData._sandbox) {
-            this._networkStatus = await checkNetwork();
+        // Check the network (FATAL)
+        if (!this._botObject.started.sandbox) {
+            this._botObject.local.networkCheck = await checkNetwork();
         } else {
             logger.info("Skipping network check in sandbox mode...");
-            this._networkStatus = true;
+            this._botObject.local.networkCheck = true;
         }
 
-        if (this._networkStatus) {
+        if (this._botObject.local.networkCheck) {
             // Connect to MongoDB (FATAL)
             this._mongoDB = await connectToDB();
 
             // Load the exchange
-            this._exchangeData._exchange = loadExchange(this._botData._sandbox);
+            this._botObject.local.exchange = loadExchange(this._botObject.started.sandbox);
 
             // Check the exchange status (FATAL)
             // Endpoint not available in sandbox mode
-            await checkExchangeStatus(this._exchangeData._exchange);
+            await checkExchangeStatus(this._botObject.local.exchange);
 
             // Load the markets
-            await loadMarkets(this._exchangeData._exchange);
+            await loadMarkets(this._botObject.local.exchange);
 
             // Local/Exchange time difference
-            this._botData._timeDifference = await exchangeTimeDifference(
-                this._exchangeData._exchange
+            this._botObject.specials.timeDifference = await exchangeTimeDifference(
+                this._botObject.local.exchange
             );
 
             // Load the balances
-            this._exchangeData._balances = await loadBalances(
-                this._exchangeData._exchange
+            this._botObject.local.balances = await loadBalances(
+                this._botObject.local.exchange
             );
 
             // Get the balances
-            this._botData._baseBalance = getBalance(
-                this._exchangeData._balances,
-                this._botData._baseCurrency
+            this._botObject.started.baseBalance = getBalance(
+                this._botObject.local.balances,
+                this._botObject.started.baseCurrency
             );
 
-            this._botData._quoteBalance = getBalance(
-                this._exchangeData._balances,
-                this._botData._quoteCurrency
+            this._botObject.started.quoteBalance = getBalance(
+                this._botObject.local.balances,
+                this._botObject.started.quoteCurrency
             );
 
             // Check the balances
-            if (this._botData._baseBalance === null) {
-                logger.error(`The base currency ${this._botData._baseCurrency} is not available!`);
+            if (this._botObject.started.baseBalance === null) {
+                logger.error(`The base currency ${this._botObject.started.baseCurrency} is not available!`);
                 process.exit(1);
             }
 
-            if (this._botData._quoteBalance === null) {
-                logger.error(`The quote currency ${this._botData._quoteCurrency} is not available!`);
+            if (this._botObject.started.quoteBalance === null) {
+                logger.error(`The quote currency ${this._botObject.started.quoteCurrency} is not available!`);
                 process.exit(1);
             }
 
-            // Statistics
-            await this._statisticsHandler();
+            // Send or get the initial bot object
+            this._botObject = await sendOrGetInitialBotObject(
+                this._mongoDB.mongoDB as Db,
+                this._botObject
+            );
         } else {
             logger.error("Network is not reliable, cannot connect to MongoDB!");
             process.exit(1);
@@ -240,20 +174,24 @@ export default class Bot {
      * Used for the statistics update and other data collections.
      */
     private async _generalLoop() {
-        while (this._botData._running) {
+        while (this._botObject.local.running) {
+            if (this._mongoDB.mongoDB) {
+                this._botObject.specials.timeDifference = await exchangeTimeDifference(
+                    this._botObject.local.exchange as ccxt.Exchange
+                );
+            }
 
-
-            // Statistics
-            this._statistics._botInfo._generalIterations += 1;
+            // General statistics update
+            this._botObject.stats.generalIterations += 1;
 
             // Update the statistics
             if (this._mongoDB.mongoDB) {
-                await updateStatistics(this._mongoDB.mongoDB, this._statistics);
+                sendBotObjectCategory(this._mongoDB.mongoDB as Db, this._botObject, "stats");
             }
 
             await new Promise(resolve => setTimeout(
                 resolve,
-                this._botData._timeframe * GENERAL_CONFIG.timeframeFactorForGeneralLoop
+                this._botObject.started.timeframe * GENERAL_CONFIG.timeframeFactorForGeneralLoop
             ));
         }
     }
@@ -262,22 +200,27 @@ export default class Bot {
      * The main loop of the bot.
      */
     private async _mainLoop() {
-        while (this._botData._running) {
+        while (this._botObject.local.running) {
             let timeframeCorrector = performance.now();
 
-            console.log("PUTE");
+            // MAIN CODE HERE
 
             timeframeCorrector = performance.now() - timeframeCorrector;
 
             // Statistics
-            this._statistics._botInfo._mainIterations += 1;
-            this._statistics._botInfo._mainTimeframeCorrector = timeframeCorrector;
+            this._botObject.stats.mainIterations += 1;
+
+            // Handle main time frame corrector special
+            this._botObject.specials.mainTimeframeCorrector = parseFloat(timeframeCorrector.toFixed(4));
+
+            const delay = parseFloat(
+                (this._botObject.started.timeframe - timeframeCorrector).toFixed(4)
+            );
 
             await new Promise(resolve => setTimeout(
                 resolve,
-                this._botData._timeframe - timeframeCorrector
+                delay
             ));
-
         }
     }
 
@@ -286,10 +229,16 @@ export default class Bot {
      */
     public async start() {
         // Await the initialization
-        await this._botData._initialized;
+        await this._botObject.local.initialized;
 
         // Main Loop
-        this._botData._running = true;
+        this._botObject.local.running = true;
+
+        // Updates the last start time
+        this._botObject.started.lastStartTime = getCurrentDateString();
+
+        // Update the statistics
+        sendBotObjectCategory(this._mongoDB.mongoDB as Db, this._botObject, "started");
 
         await Promise.all([
             this._generalLoop(),
@@ -302,19 +251,24 @@ export default class Bot {
      */
     public async stop() {
         // Await the initialization
-        await this._botData._initialized;
+        await this._botObject.local.initialized;
 
-        const time = date.format(new Date(), "YYYY-MM-DD HH:mm:ss");
+        // Stop the bot
+        this._botObject.local.running = false;
 
         // Update the statistics
-        this._statistics._timestamps._lastStopTime = time;
+        this._botObject.stopped.lastStopTime = getCurrentDateString();
 
         if (this._mongoDB.mongoDB) {
-            await updateStatistics(this._mongoDB.mongoDB, this._statistics);
-            await this._closeMongoDB();
-        }
+            // Also sends the stats from the last iterations (in case of general loop delay)
+            await sendBotObjectCategory(this._mongoDB.mongoDB as Db, this._botObject, "stats");
+            await sendBotObjectCategory(this._mongoDB.mongoDB as Db, this._botObject, "stopped");
 
-        this._botData._running = false;
+            // Close the MongoDB connection
+            if (this._mongoDB && this._mongoDB.mongoClient) {
+                await closeDBConnection(this._mongoDB.mongoClient);
+            }
+        }
 
         // Log the bot stop
         logger.info("Bot stopped.");
