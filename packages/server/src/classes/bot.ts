@@ -43,7 +43,7 @@ export default class Bot {
      * Creates a new bot instance and initialize it
      *
      * @param tradingPair The trading pair (overridden in sandbox mode).
-     * @param name The bot name (used for statistics).
+     * @param name The bot name (used for bot ID inside the database).
      * @param sandbox If the bot should run in sandbox mode.
      * @param initialQuoteBalance The initial quote balance to start with.
      * @param timeframe The timeframe to use.
@@ -171,7 +171,7 @@ export default class Bot {
 
     /**
      * General loop of the bot (no precision corrector).
-     * Used for the statistics update and other data collections.
+     * Used for the shared object update and other data collections.
      */
     private async _generalLoop() {
         while (this._botObject.local.running) {
@@ -181,12 +181,12 @@ export default class Bot {
                 );
             }
 
-            // General statistics update
-            this._botObject.stats.generalIterations += 1;
+            // General shared object update
+            this._botObject.shared.generalIterations += 1;
 
-            // Update the statistics
+            // Update the shared object
             if (this._mongoDB.mongoDB) {
-                sendBotObjectCategory(this._mongoDB.mongoDB as Db, this._botObject, "stats");
+                sendBotObjectCategory(this._mongoDB.mongoDB as Db, this._botObject, "shared");
             }
 
             await new Promise(resolve => setTimeout(
@@ -207,8 +207,8 @@ export default class Bot {
 
             timeframeCorrector = performance.now() - timeframeCorrector;
 
-            // Statistics
-            this._botObject.stats.mainIterations += 1;
+            // Update the shared object
+            this._botObject.shared.mainIterations += 1;
 
             // Handle main time frame corrector special
             this._botObject.specials.mainTimeframeCorrector = parseFloat(timeframeCorrector.toFixed(4));
@@ -237,7 +237,7 @@ export default class Bot {
         // Updates the last start time
         this._botObject.started.lastStartTime = getCurrentDateString();
 
-        // Update the statistics
+        // Update the shared object
         sendBotObjectCategory(this._mongoDB.mongoDB as Db, this._botObject, "started");
 
         await Promise.all([
@@ -256,12 +256,12 @@ export default class Bot {
         // Stop the bot
         this._botObject.local.running = false;
 
-        // Update the statistics
+        // Update the shared object
         this._botObject.stopped.lastStopTime = getCurrentDateString();
 
         if (this._mongoDB.mongoDB) {
-            // Also sends the stats from the last iterations (in case of general loop delay)
-            await sendBotObjectCategory(this._mongoDB.mongoDB as Db, this._botObject, "stats");
+            // Also sends the shared obj from the last iterations (in case of general loop delay)
+            await sendBotObjectCategory(this._mongoDB.mongoDB as Db, this._botObject, "shared");
             await sendBotObjectCategory(this._mongoDB.mongoDB as Db, this._botObject, "stopped");
 
             // Close the MongoDB connection

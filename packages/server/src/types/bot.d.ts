@@ -31,7 +31,7 @@ declare namespace NsBot {
         lastStopTime: string;
     }
 
-    interface IsBotObjectStatArrays {
+    interface IsBotObjectSharedArrays {
         tradeSizes: number[];
         tradeDurations: number[];
         tradeProfits: number[];
@@ -39,8 +39,8 @@ declare namespace NsBot {
         dailyProfits: number[];
     }
 
-    interface IsBotObjectStats {
-        arrays: IsBotObjectStatArrays;
+    interface IsBotObjectShared {
+        arrays: IsBotObjectSharedArrays;
 
         generalIterations: number;
         mainIterations: number;
@@ -74,7 +74,7 @@ declare namespace NsBot {
 
     interface IsBotObjectSpecials {
         initTime: string;
-        lastStatsUpdate: string;
+        lastSharedUpdate: string;
 
         mainTimeframeCorrector: number;
         timeDifference: number;
@@ -83,7 +83,7 @@ declare namespace NsBot {
     interface IsBotObject {
         started: IsBotObjectStarted;
         stopped: IsBotObjectStopped;
-        stats: IsBotObjectStats;
+        shared: IsBotObjectShared;
         local: IsBotObjectLocal;
         specials: IsBotObjectSpecials;
     }

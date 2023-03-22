@@ -8,14 +8,14 @@ import NsBot from "types/bot";
  *
  * @param started Sent to the database when the bot is started (overriding the data inside the DB).
  * @param stopped Sent to the database when the bot is stopped (overriding the data inside the DB).
- * @param stats Statistics shared with the database (recovered from the DB then updated).
+ * @param shared Shared with the database (recovered from the DB then updated).
  * @param local Not shared with the database (only used locally).
  * @param specials Special data not matching other categories.
  */
 export const botObject: NsBot.IsBotObject = {
     started: {
         // Bot info
-        name: "",                          // Bot name (used for statistics & converted to ObjectId)
+        name: "",                          // Bot name (used for bot ID inside the database)
         id: "",                            // Bot object identifier (MongoDB objectID)
         sandbox: false,                    // Sandbox mode
 
@@ -36,7 +36,7 @@ export const botObject: NsBot.IsBotObject = {
         lastStopTime: "",                  // Last stop time
     },
 
-    stats: {
+    shared: {
         // List of arrays for average calculations
         arrays: {
             tradeSizes: [],                // Trade sizes
@@ -90,7 +90,7 @@ export const botObject: NsBot.IsBotObject = {
     specials: {
         // Timestamps
         initTime: "",                      // First initialization time
-        lastStatsUpdate: "",               // Last statistics update time
+        lastSharedUpdate: "",               // Last shared object update time
 
         // Timings
         mainTimeframeCorrector: 0,         // Last timeframe corrector for main iterations (in ms)

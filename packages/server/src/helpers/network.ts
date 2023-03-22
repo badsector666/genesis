@@ -146,7 +146,7 @@ export async function closeDBConnection(mongoClient: MongoClient) {
  * Check if the bot object already exists in the database.
  * @param mongoDB The MongoDB database.
  * @param botIdentifier The bot object identifier (objectID from MongoDB).
- * @returns If the statistics exist.
+ * @returns If the bot object exist.
  */
 async function checkBotObjectExistenceInDB(mongoDB: Db, botIdentifier: string) {
     try {
@@ -183,7 +183,7 @@ async function sendInitialBotObjectToDB(mongoDB: Db, botObject: NsBot.IsBotObjec
             _id: ObjectId.createFromHexString(botObject.started.id),
             started: botObject.started,
             stopped: botObject.stopped,
-            stats: botObject.stats,
+            shared: botObject.shared,
             specials: botObject.specials,
         });
 
@@ -198,7 +198,7 @@ async function sendInitialBotObjectToDB(mongoDB: Db, botObject: NsBot.IsBotObjec
  * Note that it also recovers the specials object.
  * @param mongoDB The MongoDB database.
  * @param botObject The bot object.
- * @returns The bot object with stat vars recovered from database.
+ * @returns The bot object with shared vars recovered from database.
  */
 async function getBotObjectFromDB(
     mongoDB: Db,
@@ -212,8 +212,8 @@ async function getBotObjectFromDB(
         if (res) {
             logger.verbose("Bot object successfully retrieved from the database.");
 
-            // Get the stats object (and specials object)
-            botObject.stats = res.stats as NsBot.IsBotObjectStats;
+            // Get the shared object (and specials object)
+            botObject.shared = res.shared as NsBot.IsBotObjectShared;
             botObject.specials = res.specials as NsBot.IsBotObjectSpecials;
 
             return botObject;
@@ -257,7 +257,7 @@ export async function sendOrGetInitialBotObject(mongoDB: Db, botObject: NsBot.Is
 }
 
 /**
- * Updates different categories of the bot object (started, stopped or stats).
+ * Updates different categories of the bot object (started, stopped or shared).
  * Note that it also updates the specials category.
  *
  * @param mongoDB The MongoDB database.
@@ -266,11 +266,11 @@ export async function sendOrGetInitialBotObject(mongoDB: Db, botObject: NsBot.Is
 export async function sendBotObjectCategory(
     mongoDB: Db,
     botObject: NsBot.IsBotObject,
-    category: "started" | "stopped" | "stats"
+    category: "started" | "stopped" | "shared"
 ) {
     try {
-        // Handle last stats update special
-        botObject.specials.lastStatsUpdate = getCurrentDateString();
+        // Handle last shared update special
+        botObject.specials.lastSharedUpdate = getCurrentDateString();
 
         await mongoDB.collection(NETWORK_CONFIG.database).updateOne(
             {
