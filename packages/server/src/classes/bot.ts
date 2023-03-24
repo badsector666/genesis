@@ -1,7 +1,7 @@
 import ccxt from "ccxt";
 import { Db } from "mongodb";
 
-import { botObject } from "configs/defaults.config";
+import { botObject } from "configs/bot.config";
 import { EXCHANGE_CONFIG, GENERAL_CONFIG } from "configs/global.config";
 import {
 } from "utils/algorithm";
@@ -27,13 +27,13 @@ import {
     sendBotObjectCategory,
     sendOrGetInitialBotObject
 } from "helpers/network";
-import NsBot from "types/bot";
+import NsBotObject from "types/botObject";
 import logger from "utils/logger";
 
 
 export default class Bot {
     private _botObject = botObject;
-    private _mongoDB: NsBot.IsMongoDB = {
+    private _mongoDB: NsBotObject.IsMongoDB = {
         mongoClient: null,
         mongoDB: null
     };
@@ -63,19 +63,19 @@ export default class Bot {
         }
 
         // Bot static parameters
-        this._botObject.started.name = name;
-        this._botObject.started.id = getObjectId(sandbox, name);
-        this._botObject.started.sandbox = sandbox;
+        this._botObject.start.name = name;
+        this._botObject.start.id = getObjectId(sandbox, name);
+        this._botObject.start.sandbox = sandbox;
 
         // Trading pair
         const tokens = parseTradingPair(tradingPair);
-        this._botObject.started.tradingPair = tradingPair;
-        this._botObject.started.baseCurrency = tokens.base;
-        this._botObject.started.quoteCurrency = tokens.quote;
-        this._botObject.started.initialQuoteBalance = initialQuoteBalance;
+        this._botObject.start.tradingPair = tradingPair;
+        this._botObject.start.baseCurrency = tokens.base;
+        this._botObject.start.quoteCurrency = tokens.quote;
+        this._botObject.start.initialQuoteBalance = initialQuoteBalance;
 
         // Timestamps
-        this._botObject.started.timeframe = getTimeframe(timeframe);
+        this._botObject.start.timeframe = getTimeframe(timeframe);
 
         // Logging
         logger.info(`New "${name}" bot instance for ${tradingPair} created.`);
@@ -93,7 +93,7 @@ export default class Bot {
      */
     private async _initialize() {
         // Real mode warning with user input (FATAL)
-        if (!this._botObject.started.sandbox) {
+        if (!this._botObject.start.sandbox) {
             const answer = await getUserInput(
                 "Sandbox mode is disabled! Would you like to continue? (y/n)"
             );
@@ -105,7 +105,7 @@ export default class Bot {
         }
 
         // Check the network (FATAL)
-        if (!this._botObject.started.sandbox) {
+        if (!this._botObject.start.sandbox) {
             this._botObject.local.networkCheck = await checkNetwork();
         } else {
             logger.info("Skipping network check in sandbox mode...");
@@ -117,7 +117,7 @@ export default class Bot {
             this._mongoDB = await connectToDB();
 
             // Load the exchange
-            this._botObject.local.exchange = loadExchange(this._botObject.started.sandbox);
+            this._botObject.local.exchange = loadExchange(this._botObject.start.sandbox);
 
             // Check the exchange status (FATAL)
             // Endpoint not available in sandbox mode
@@ -137,24 +137,24 @@ export default class Bot {
             );
 
             // Get the balances
-            this._botObject.started.baseBalance = getBalance(
+            this._botObject.start.baseBalance = getBalance(
                 this._botObject.local.balances,
-                this._botObject.started.baseCurrency
+                this._botObject.start.baseCurrency
             );
 
-            this._botObject.started.quoteBalance = getBalance(
+            this._botObject.start.quoteBalance = getBalance(
                 this._botObject.local.balances,
-                this._botObject.started.quoteCurrency
+                this._botObject.start.quoteCurrency
             );
 
             // Check the balances
-            if (this._botObject.started.baseBalance === null) {
-                logger.error(`The base currency ${this._botObject.started.baseCurrency} is not available!`);
+            if (this._botObject.start.baseBalance === null) {
+                logger.error(`The base currency ${this._botObject.start.baseCurrency} is not available!`);
                 process.exit(1);
             }
 
-            if (this._botObject.started.quoteBalance === null) {
-                logger.error(`The quote currency ${this._botObject.started.quoteCurrency} is not available!`);
+            if (this._botObject.start.quoteBalance === null) {
+                logger.error(`The quote currency ${this._botObject.start.quoteCurrency} is not available!`);
                 process.exit(1);
             }
 
@@ -191,7 +191,7 @@ export default class Bot {
 
             await new Promise(resolve => setTimeout(
                 resolve,
-                this._botObject.started.timeframe * GENERAL_CONFIG.timeframeFactorForGeneralLoop
+                this._botObject.start.timeframe * GENERAL_CONFIG.timeframeFactorForGeneralLoop
             ));
         }
     }
@@ -214,7 +214,7 @@ export default class Bot {
             this._botObject.specials.mainTimeframeCorrector = parseFloat(timeframeCorrector.toFixed(4));
 
             const delay = parseFloat(
-                (this._botObject.started.timeframe - timeframeCorrector).toFixed(4)
+                (this._botObject.start.timeframe - timeframeCorrector).toFixed(4)
             );
 
             await new Promise(resolve => setTimeout(
@@ -235,10 +235,10 @@ export default class Bot {
         this._botObject.local.running = true;
 
         // Updates the last start time
-        this._botObject.started.lastStartTime = getCurrentDateString();
+        this._botObject.start.lastStartTime = getCurrentDateString();
 
         // Update the shared object
-        sendBotObjectCategory(this._mongoDB.mongoDB as Db, this._botObject, "started");
+        sendBotObjectCategory(this._mongoDB.mongoDB as Db, this._botObject, "start");
 
         await Promise.all([
             this._generalLoop(),
@@ -257,12 +257,12 @@ export default class Bot {
         this._botObject.local.running = false;
 
         // Update the shared object
-        this._botObject.stopped.lastStopTime = getCurrentDateString();
+        this._botObject.stop.lastStopTime = getCurrentDateString();
 
         if (this._mongoDB.mongoDB) {
             // Also sends the shared obj from the last iterations (in case of general loop delay)
             await sendBotObjectCategory(this._mongoDB.mongoDB as Db, this._botObject, "shared");
-            await sendBotObjectCategory(this._mongoDB.mongoDB as Db, this._botObject, "stopped");
+            await sendBotObjectCategory(this._mongoDB.mongoDB as Db, this._botObject, "stop");
 
             // Close the MongoDB connection
             if (this._mongoDB && this._mongoDB.mongoClient) {

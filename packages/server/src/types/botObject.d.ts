@@ -2,7 +2,7 @@ import ccxt from "ccxt";
 import { Db } from "mongodb";
 
 
-declare namespace NsBot {
+declare namespace NsBotObject {
     /**
      * MongoDB data.
      */
@@ -11,7 +11,7 @@ declare namespace NsBot {
         mongoDB: Db | null;
     }
 
-    interface IsBotObjectStarted {
+    interface IsBotObjectStart {
         name: string;
         id: string;
         timeframe: number;
@@ -27,7 +27,7 @@ declare namespace NsBot {
         lastStartTime: string;
     }
 
-    interface IsBotObjectStopped {
+    interface IsBotObjectStop {
         lastStopTime: string;
     }
 
@@ -81,8 +81,8 @@ declare namespace NsBot {
     }
 
     interface IsBotObject {
-        started: IsBotObjectStarted;
-        stopped: IsBotObjectStopped;
+        start: IsBotObjectStart;
+        stop: IsBotObjectStop;
         shared: IsBotObjectShared;
         local: IsBotObjectLocal;
         specials: IsBotObjectSpecials;

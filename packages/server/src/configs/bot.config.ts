@@ -1,4 +1,4 @@
-import NsBot from "types/bot";
+import NsBotObject from "types/botObject";
 
 
 /**
@@ -6,14 +6,14 @@ import NsBot from "types/bot";
  *
  * This object contains multiple categories, each one with a specific purpose:
  *
- * @param started Sent to the database when the bot is started (overriding the data inside the DB).
- * @param stopped Sent to the database when the bot is stopped (overriding the data inside the DB).
+ * @param start Sent to the database when the bot is started (overriding the data inside the DB).
+ * @param stop Sent to the database when the bot is stopped (overriding the data inside the DB).
  * @param shared Shared with the database (recovered from the DB then updated).
  * @param local Not shared with the database (only used locally).
  * @param specials Special data not matching other categories.
  */
-export const botObject: NsBot.IsBotObject = {
-    started: {
+export const botObject: NsBotObject.IsBotObject = {
+    start: {
         // Bot info
         name: "",                          // Bot name (used for bot ID inside the database)
         id: "",                            // Bot object identifier (MongoDB objectID)
@@ -32,7 +32,7 @@ export const botObject: NsBot.IsBotObject = {
         timeframe: 0,                      // Timeframe  (in ms)
     },
 
-    stopped: {
+    stop: {
         lastStopTime: "",                  // Last stop time
     },
 
@@ -63,7 +63,7 @@ export const botObject: NsBot.IsBotObject = {
         totalTradeVolume: 0,               // Total trade volume (in quote currency)
         totalFees: 0,                      // Total fees (in quote currency)
         totalProfit: 0,                    // Total profit (in quote currency)
-
+  
         // Average trading statistics
         avgTradeSize: 0,                   // Average trade size (in quote currency)
         avgTradeDuration: 0,               // Average trade duration (in seconds)

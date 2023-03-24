@@ -3,7 +3,7 @@ import speedTest from "speedtest-net";
 
 import { NETWORK_CONFIG } from "configs/global.config";
 import { getCurrentDateString } from "helpers/inputs";
-import NsBot from "types/bot";
+import NsBotObject from "types/botObject";
 import logger from "utils/logger";
 
 
@@ -174,15 +174,15 @@ async function checkBotObjectExistenceInDB(mongoDB: Db, botIdentifier: string) {
  * @param mongoDB The MongoDB database.
  * @param botObject The bot object.
  */
-async function sendInitialBotObjectToDB(mongoDB: Db, botObject: NsBot.IsBotObject) {
+async function sendInitialBotObjectToDB(mongoDB: Db, botObject: NsBotObject.IsBotObject) {
     try {
         // Handle init time special
         botObject.specials.initTime = getCurrentDateString();
 
         await mongoDB.collection(NETWORK_CONFIG.database).insertOne({
-            _id: ObjectId.createFromHexString(botObject.started.id),
-            started: botObject.started,
-            stopped: botObject.stopped,
+            _id: ObjectId.createFromHexString(botObject.start.id),
+            start: botObject.start,
+            stop: botObject.stop,
             shared: botObject.shared,
             specials: botObject.specials,
         });
@@ -202,19 +202,19 @@ async function sendInitialBotObjectToDB(mongoDB: Db, botObject: NsBot.IsBotObjec
  */
 async function getBotObjectFromDB(
     mongoDB: Db,
-    botObject: NsBot.IsBotObject
-): Promise<NsBot.IsBotObject | null> {
+    botObject: NsBotObject.IsBotObject
+): Promise<NsBotObject.IsBotObject | null> {
     try {
         const res = await mongoDB.collection(NETWORK_CONFIG.database).findOne({
-            _id: ObjectId.createFromHexString(botObject.started.id)
+            _id: ObjectId.createFromHexString(botObject.start.id)
         });
 
         if (res) {
             logger.verbose("Bot object successfully retrieved from the database.");
 
             // Get the shared object (and specials object)
-            botObject.shared = res.shared as NsBot.IsBotObjectShared;
-            botObject.specials = res.specials as NsBot.IsBotObjectSpecials;
+            botObject.shared = res.shared as NsBotObject.IsBotObjectShared;
+            botObject.specials = res.specials as NsBotObject.IsBotObjectSpecials;
 
             return botObject;
         } else {
@@ -233,9 +233,9 @@ async function getBotObjectFromDB(
  * @param botObject The bot object.
  * @returns Either the DB object or the unmodified passed bot object.
  */
-export async function sendOrGetInitialBotObject(mongoDB: Db, botObject: NsBot.IsBotObject) {
+export async function sendOrGetInitialBotObject(mongoDB: Db, botObject: NsBotObject.IsBotObject) {
     // Check if the bot object already exists in the database
-    const existence = await checkBotObjectExistenceInDB(mongoDB, botObject.started.id);
+    const existence = await checkBotObjectExistenceInDB(mongoDB, botObject.start.id);
 
     if (existence) {
         // Get the bot object from the database
@@ -257,7 +257,7 @@ export async function sendOrGetInitialBotObject(mongoDB: Db, botObject: NsBot.Is
 }
 
 /**
- * Updates different categories of the bot object (started, stopped or shared).
+ * Updates different categories of the bot object (start, stop or shared).
  * Note that it also updates the specials category.
  *
  * @param mongoDB The MongoDB database.
@@ -265,8 +265,8 @@ export async function sendOrGetInitialBotObject(mongoDB: Db, botObject: NsBot.Is
  */
 export async function sendBotObjectCategory(
     mongoDB: Db,
-    botObject: NsBot.IsBotObject,
-    category: "started" | "stopped" | "shared"
+    botObject: NsBotObject.IsBotObject,
+    category: "start" | "stop" | "shared"
 ) {
     try {
         // Handle last shared update special
@@ -274,7 +274,7 @@ export async function sendBotObjectCategory(
 
         await mongoDB.collection(NETWORK_CONFIG.database).updateOne(
             {
-                _id: ObjectId.createFromHexString(botObject.started.id)
+                _id: ObjectId.createFromHexString(botObject.start.id)
             },
             {
                 $set: {
