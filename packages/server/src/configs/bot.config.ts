@@ -63,7 +63,7 @@ export const botObject: NsBotObject.IsBotObject = {
         totalTradeVolume: 0,               // Total trade volume (in quote currency)
         totalFees: 0,                      // Total fees (in quote currency)
         totalProfit: 0,                    // Total profit (in quote currency)
-  
+
         // Average trading statistics
         avgTradeSize: 0,                   // Average trade size (in quote currency)
         avgTradeDuration: 0,               // Average trade duration (in seconds)
