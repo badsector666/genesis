@@ -4,54 +4,58 @@ A Typescript-based trading bot that leverages the volatility of the crypto marke
 
 Technical summary
 -----------------
-The two services are the server (TS Node) and the client (React - TS).
-
-- Stop loss order, minimize losses by defining a loss limit ([Trailing stop loss ~20%](https://www.quant-investing.com/blog/truths-about-stop-losses-that-nobody-wants-to-believe)).
+The two services (monorepo with Yarn workspaces) are the server (TS Node) and the client (React - TS).
 
 
 The parts
 -------------
 This bot is separated into 3 parts:
 - The first part is the **bot initialization** which ensures proper network & exchange connections.
+
 - The second part is the **secure order system**, this part is mainly charged to call the strategy
 pool for an answer concerning the decision to make while ensuring that this decision is profitable.
 it fetches the last ticker and ensure profits while including the transaction fees.
-It also implements a stop-loss system.
-- The third part called the **strategy pool** is the actual algorithms that controls the bot
+It also implements a stop-loss system ([Trailing stop loss ~20%](https://www.quant-investing.com/blog/truths-about-stop-losses-that-nobody-wants-to-believe)).
+
+- The third part called the **strategy pool** which is the actual algorithms that controls the bot,
+it works by implementing multiple algorithms with different strategies and allowing them to vote,
+a weight voting will later be implemented allowing some fine-tuning of the bot.
 
 
 Loop system
 -----------
-The bot runs with two `Promise` loops, one is the main loop used for the orders (secure order system),
+The bot runs with two `Promise` loops, one is the main loop which is used for the orders (secure order system),
 algorithms etc.. the other one is the general one, used for statistics & other data update.
 
 It's important to note that the main loop iteration internal time is measured using `performance.now()`,
-so the internal time is subtracted to the final timeframe for a better precision.
+so the internal time is subtracted from the final loop time for a better overall precision.
 
 
 Bot initialization
 ------------------
-Here's a sorted list of all the steps used by the bot during initialization,
-either to ensure its good function, or to recover initial data.
+Here's a sorted list of all the steps used by the bot during initialization to ensure
+its good function and to recover initial data.
 
 `*` means that this feature is skipped in Sandbox mode for speed or API availability reasons.
 
-- `*` Warning with user input for non-sandbox mode (reply `y` to continue, or any other char to stop the bot).
-- `*` Check the network overall quality, the min values to pass the test can be found inside
+- The trading pair in sandbox mode is replaced by the one inside `global.config.ts` as the
+  Binance sandbox API don't provide a wallet with a lot of different tokens inside of it.
+- `*` Warning with an user input for non-sandbox mode (reply `y` to continue, or any other char to stop the bot).
+- `*` Check the network overall quality, the min/max values to pass the test can be found inside
   `global.config.ts`, these values are the download and upload speed, the latency and the jitter
-  of your network. Note that the download and upload speed are limited to 10 Mo/s by the API that
-  I'm using.
+  of the network. Note that the download and upload speed are limited to 10 Mo/s by the API so it's
+  normal if the results don't go further than 10 Mo/s.
 - Connect to the MongoDB database.
-- Load the exchange (with sandbox or real mode passed directly)
+- Load the exchange (with sandbox or real mode which is a parameter of the exchange loading function).
 - `*` Check the exchange status (Not available with Binance Sandbox API).
 - Load the markets from the Binance API.
 - Measure the difference of time between the Binance API servers and the local time,
   note that to improve the overall precision of the test, a `performance.now()` measures
-  the time that the await function takes.
+  the time that the await function takes, for now, it's just to have a general idea of the latency.
 - Load all the balances from the Binance account linked to the API.
 - Get the balances depending on the actual trading pair used (base/quote).
 - Check the existence of these balances.
-- Handle the statistics with the database (create new ones or recover existing ones for an ID).
+- Handle the statistics with the database (create new ones or recover existing ones from the bot ID).
 
 
 Secure order system
@@ -60,11 +64,10 @@ This part is mainly charged to call the strategy pool for an answer concerning t
 to make while ensuring that this decision is profitable.
 
 It implements two main methods to prevent wrong decisions:
-- A stop-loss system used to prevent the bot for keeping its position too long.
-- A profit calculator, checking that the profits are always > 0.
+- A stop-loss system used to prevent the bot for keeping its position too long ([Trailing stop loss ~20%](https://www.quant-investing.com/blog/truths-about-stop-losses-that-nobody-wants-to-believe)).
+- A profit calculator, checking that the profits are always > 0 while including the fees.
 
-Note that these two methods should be only considered as fallbacks for the strategy pool and
-not used as universal calculators.
+**Note that these two methods should be only considered as fallbacks for the strategy pool.**
 
 This part actually corresponds to the `main loop` of the bot.
 
