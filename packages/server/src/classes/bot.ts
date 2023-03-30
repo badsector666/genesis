@@ -203,7 +203,17 @@ export default class Bot {
         while (this._botObject.local.running) {
             let timeframeCorrector = performance.now();
 
-            // MAIN CODE HERE
+            // Calls the strategy pool, which will call the strategies
+            // Should decide if the data are recovered here or in the strategy pool
+            // Note that a part of the data are necessary at this level for trailing stop loos
+            // and profit calculation
+
+            // Mostly, not that much data is needed, as most of the data used by strategies
+            // are averages from the OHLCV data
+
+            // The OHLCV should not be called at every iteration as it is not necessary
+            // for last data, the best thing to do is to create a cache with an unix timestamp for
+            // each value, at the next iteration, just recover X missing values.
 
             timeframeCorrector = performance.now() - timeframeCorrector;
 
