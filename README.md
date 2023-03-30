@@ -56,7 +56,7 @@ It implements two main methods to prevent wrong decisions:
 - A stop-loss system used to prevent the bot for keeping its position too long ([Trailing stop loss ~20%](https://www.quant-investing.com/blog/truths-about-stop-losses-that-nobody-wants-to-believe)).
 - A profit calculator, checking that the profits are always > 0 while including the fees.
 
-**Note that these two methods are ONLY fallback verifications for the strategy pool, they're not indented to trigger frequently.**
+**Note that these two methods are ONLY fallback verifications for the strategy pool, they're not intended to trigger frequently.**
 
 
 Strategy pool
