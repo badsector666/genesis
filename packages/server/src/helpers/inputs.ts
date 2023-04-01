@@ -5,6 +5,7 @@ import date from "date-and-time";
 import { ObjectId } from "mongodb";
 
 import { GENERAL_CONFIG } from "configs/global.config";
+import NsGeneral from "types/general";
 import logger from "utils/logger";
 
 
@@ -61,7 +62,7 @@ export function getUserInput(question: string): Promise<string> {
  * @returns The time in ms.
  */
 export function getTimeframe(
-    timeString: "1s" | "30s" | "1m" | "3m" | "5m" | "15m" | "30m" | "1h" | "2h" | "4h" | "1d" = "1m"
+    timeString: NsGeneral.IsTimeframe = "1m"
 ) {
     const time = parseInt(timeString.slice(0, -1));
     const timeframe = timeString.slice(-1);

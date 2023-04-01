@@ -74,9 +74,10 @@ export const botObject: NsBotObject.IsBotObject = {
 
     local: {
         // Promise to wait for the bot to be initialized
-        initialized: new Promise<void>(() => {
-            return null;
-        }),
+        initialized: new Promise<void>(() => null),
+
+        // Timeframe
+        stringTimeframe: "1m", // Timeframe (in string format)
 
         // Bot statuses
         running: false,                    // If the bot is running
@@ -85,6 +86,9 @@ export const botObject: NsBotObject.IsBotObject = {
         // Loaded from CCXT
         exchange: null,                    // Exchange
         balances: null,                    // Exchange balances
+
+        // Cache
+        cache: null,                       // Cache (OHLCV & other data)
     },
 
     specials: {

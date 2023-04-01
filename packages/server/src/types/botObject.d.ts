@@ -1,6 +1,9 @@
 import ccxt from "ccxt";
 import { Db } from "mongodb";
 
+import Cache from "classes/cache";
+import NsGeneral from "types/general";
+
 
 declare namespace NsBotObject {
     /**
@@ -66,10 +69,12 @@ declare namespace NsBotObject {
 
     interface IsBotObjectLocal {
         initialized: Promise<void>;
+        stringTimeframe: NsGeneral.IsTimeframe;
         running: boolean;
         networkCheck: boolean;
         exchange: ccxt.Exchange | null;
         balances: ccxt.Balances | null;
+        cache: Cache | null;
     }
 
     interface IsBotObjectSpecials {
@@ -90,4 +95,4 @@ declare namespace NsBotObject {
 }
 
 
-export default NsBot;
+export default NsBotObject;

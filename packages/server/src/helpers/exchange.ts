@@ -184,9 +184,10 @@ export async function fetchOHLCV(
     exchange: ccxt.Exchange,
     symbol: string,
     timeframe = "1m",
+    since: number | undefined = undefined,
     limit = 60
 ): Promise<ccxt.OHLCV[]> {
-    const ohlcv = await exchange.fetchOHLCV(symbol, timeframe, undefined, limit);
+    const ohlcv = await exchange.fetchOHLCV(symbol, timeframe, since, limit);
 
     // Log the OHLCV information
     logger.verbose(`${exchange.name} OHLCV fetched for ${symbol} (${limit} x ${timeframe}).`);

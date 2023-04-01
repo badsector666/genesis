@@ -1,6 +1,7 @@
 import ccxt from "ccxt";
 import { Db } from "mongodb";
 
+import Cache from "classes/cache";
 import { botObject } from "configs/bot.config";
 import { EXCHANGE_CONFIG, GENERAL_CONFIG } from "configs/global.config";
 import {
@@ -28,6 +29,7 @@ import {
     sendOrGetInitialBotObject
 } from "helpers/network";
 import NsBotObject from "types/botObject";
+import NsGeneral from "types/general";
 import logger from "utils/logger";
 
 
@@ -54,7 +56,7 @@ export default class Bot {
         name: string,
         sandbox = true,
         initialQuoteBalance = 0,
-        timeframe: "1s" | "30s" | "1m" | "3m" | "5m" | "15m" | "30m" | "1h" | "2h" | "4h" | "1d" = "1m"
+        timeframe: NsGeneral.IsTimeframe = "1m"
     ) {
         // Sandbox mode overrides the trading pair
         // As most of currencies are not available in sandbox mode
@@ -75,6 +77,7 @@ export default class Bot {
         this._botObject.start.initialQuoteBalance = initialQuoteBalance;
 
         // Timestamps
+        this._botObject.local.stringTimeframe = timeframe;
         this._botObject.start.timeframe = getTimeframe(timeframe);
 
         // Logging
@@ -91,7 +94,7 @@ export default class Bot {
     /**
      * Initialize the bot.
      */
-    private async _initialize() {
+    private async _initialize(): Promise<void> {
         // Real mode warning with user input (FATAL)
         if (!this._botObject.start.sandbox) {
             const answer = await getUserInput(
@@ -158,6 +161,16 @@ export default class Bot {
                 process.exit(1);
             }
 
+            // Get the cache (OHLCV & other data)
+            this._botObject.local.cache = new Cache(
+                this._botObject.local.exchange,
+                this._botObject.start.tradingPair,
+                this._botObject.local.stringTimeframe,
+                168
+            );
+
+            await this._botObject.local.cache.load();
+
             // Send or get the initial bot object
             this._botObject = await sendOrGetInitialBotObject(
                 this._mongoDB.mongoDB as Db,
@@ -173,19 +186,19 @@ export default class Bot {
      * General loop of the bot (no precision corrector).
      * Used for the shared object update and other data collections.
      */
-    private async _generalLoop() {
+    private async _generalLoop(): Promise<void> {
         while (this._botObject.local.running) {
-            if (this._mongoDB.mongoDB) {
+            // Verifies if the bot is still running
+            // Because the bot could be stopped during the loop
+            if (this._botObject.local.running && this._mongoDB.mongoDB) {
                 this._botObject.specials.timeDifference = await exchangeTimeDifference(
                     this._botObject.local.exchange as ccxt.Exchange
                 );
-            }
 
-            // General shared object update
-            this._botObject.shared.generalIterations += 1;
+                // General shared object update
+                this._botObject.shared.generalIterations += 1;
 
-            // Update the shared object
-            if (this._mongoDB.mongoDB) {
+                // Update the shared object
                 sendBotObjectCategory(this._mongoDB.mongoDB as Db, this._botObject, "shared");
             }
 
@@ -199,7 +212,7 @@ export default class Bot {
     /**
      * The main loop of the bot.
      */
-    private async _mainLoop() {
+    private async _mainLoop(): Promise<void> {
         while (this._botObject.local.running) {
             let timeframeCorrector = performance.now();
 
@@ -237,7 +250,7 @@ export default class Bot {
     /**
      * Start the bot.
      */
-    public async start() {
+    public async start(): Promise<void> {
         // Await the initialization
         await this._botObject.local.initialized;
 
@@ -259,7 +272,7 @@ export default class Bot {
     /**
      * Stop the bot.
      */
-    public async stop() {
+    public async stop(): Promise<void> {
         // Await the initialization
         await this._botObject.local.initialized;
 
