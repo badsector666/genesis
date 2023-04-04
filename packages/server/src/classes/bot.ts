@@ -169,6 +169,7 @@ export default class Bot {
                 168
             );
 
+            // Load the initial cache
             await this._botObject.local.cache.load();
 
             // Send or get the initial bot object
