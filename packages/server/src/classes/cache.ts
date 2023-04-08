@@ -38,12 +38,6 @@ export default class Cache {
 
     }
 
-    public async load(): Promise<void> {
-        this._ohlcv = await fetchOHLCV(this._exchange, this._tradingPair, this._timeframe);
-
-        console.log(this._ohlcv);
-    }
-
     /**
      * Updates the OHLCV with the latest data.
      */
@@ -51,4 +45,13 @@ export default class Cache {
         //
     }
 
+    public async load(): Promise<void> {
+        this._ohlcv = await fetchOHLCV(this._exchange, this._tradingPair, this._timeframe);
+
+        console.log(this._ohlcv);
+    }
+
+    public async update(): Promise<void> {
+        //
+    }
 }
