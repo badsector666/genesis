@@ -166,7 +166,7 @@ export default class Bot {
                 this._botObject.local.exchange,
                 this._botObject.start.tradingPair,
                 this._botObject.local.stringTimeframe,
-                168
+                4
             );
 
             // Load the initial cache
@@ -216,6 +216,11 @@ export default class Bot {
     private async _mainLoop(): Promise<void> {
         while (this._botObject.local.running) {
             let timeframeCorrector = performance.now();
+
+            // Update the cache
+            if (this._botObject.local.cache) {
+                await this._botObject.local.cache.update();
+            }
 
             // Calls the strategy pool, which will call the strategies
             // Should decide if the data are recovered here or in the strategy pool

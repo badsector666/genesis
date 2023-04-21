@@ -9,7 +9,7 @@ bot.start();
 
 setTimeout(async () => {
     await bot.stop();
-}, 5000);
+}, 60000);
 
 
 // import { getProcessUsage } from "utils/performances";

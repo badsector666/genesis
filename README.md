@@ -23,7 +23,7 @@ The bot runs into multiple loops, the reason for that is that the synchronizatio
 
 - The **main loop** implements the logic for the secure order system and the strategy pool, its timing is defined by the timeframe parameter of the bot class.
 
-- The **general loop** implements the synchronization system with the MongoDB database, it works by checking the existence of a bot with the same ID as the hash of the provided name parameter (+ `-sandbox` if in sandbox mode) and send initial data or recover & update existing data. Its timing is defined as X times the main loop timeframe (by default, it's 2).
+- The **general loop** implements the synchronization system with the MongoDB database, it works by checking the existence of a bot with the same ID as the hash of the provided name parameter (+ `-sandbox` if in sandbox mode) and send initial data or recover & update existing data. Its timing is defined as X times the main loop timeframe (by default, it's 4).
 
 It's important to note that the main loop iteration internal time is measured using `performance.now()`, so the internal time is subtracted from the final loop time for a better overall precision.
 

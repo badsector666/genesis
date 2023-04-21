@@ -2,8 +2,8 @@
  * General configuration.
  */
 export const GENERAL_CONFIG = {
-    verbose: true,                      // Set the winston logger to verbose mode
-    timeframeFactorForGeneralLoop: 2,   // The timeframe factor for the general loop (x2 by default)
+    verbose: false,                      // Set the winston logger to verbose mode
+    timeframeFactorForGeneralLoop: 4,   // The timeframe factor for the general loop (x4 by default)
     dateFormat: "YYYY-MM-DD HH:mm:ss"   // Date format
 };
 
