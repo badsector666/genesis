@@ -1,4 +1,4 @@
-# Bibobot
+# Genesis
 A Typescript-based trading bot that leverages the volatility of the crypto market to make profits.
 
 
