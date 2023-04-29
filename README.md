@@ -5,7 +5,9 @@
 </p>
 
 <p align="center">
-    <img src="https://img.shields.io/badge/made%20by-Yoratoni-858FF0?style=flat-square">
+    <a href="https://github.com/yoratoni" target="_blank">
+        <img src="https://img.shields.io/badge/made%20by-Yoratoni-858FF0?style=flat-square">
+    </a>
     <a href="https://github.com/yoratoni/genesis/blob/main/LICENSE" target="_blank">
         <img src="https://img.shields.io/github/license/yoratoni/bibobot?color=D962F2&style=flat-square">
     </a>
