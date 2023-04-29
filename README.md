@@ -1,5 +1,5 @@
 # Genesis
-A Typescript-based trading bot that leverages the volatility of the crypto market to make profits.
+A crypto trading bot that uses the volatility of the market to make profits.
 
 
 Technical summary
