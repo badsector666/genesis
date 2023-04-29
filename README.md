@@ -8,7 +8,7 @@
 ---
 
 <p align="center">
-    <img src="https://img.shields.io/badge/made%20by-Yoratoni-green">
+    <img src="https://img.shields.io/badge/made%20by-Yoratoni-green?style=flat-square">
     <a href="https://github.com/yoratoni/genesis/blob/main/LICENSE" target="_blank">
         <img src="https://img.shields.io/github/license/yoratoni/bibobot?style=flat-square">
     </a>
