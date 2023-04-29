@@ -6,6 +6,8 @@
     </p>
 <br/>
 
+---
+
 <br/>
     <p align="center">
         <img src="https://img.shields.io/badge/made%20by-Yoratoni-green">
