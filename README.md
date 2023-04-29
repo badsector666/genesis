@@ -12,10 +12,7 @@
     <a href="https://github.com/yoratoni/genesis/issues" target="_blank">
         <img src="https://img.shields.io/github/issues/yoratoni/genesis?color=green&style=flat-square">
     </a>
-</p>
-<p align="center">
     <a href="https://github.com/yoratoni/genesis/blob/main/package.json" target="_blank">
         <img src="https://img.shields.io/github/package-json/v/yoratoni/genesis?style=flat-square">
     </a>
-    <img src="https://img.shields.io/github/languages/code-size/yoratoni/genesis?style=flat-square">
 </p>
