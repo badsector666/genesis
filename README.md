@@ -1,11 +1,8 @@
-
 <p align="center">
     <a href="https://github.com/yoratoni/genesis" target="_blank">
         <img src="https://raw.githubusercontent.com/yoratoni/genesis/main/assets/logo.png?token=GHSAT0AAAAAABZOCAUYNHYFSI6YFTTFJQSGZCM6TJQ" width="300" alt="Genesis logo">
     </a>
 </p>
-
----
 
 <p align="center">
     <img src="https://img.shields.io/badge/made%20by-Yoratoni-green?style=flat-square">
