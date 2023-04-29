@@ -19,7 +19,7 @@
         </a>
     </p>
     <p align="center">
-        <img src="https://img.shields.io/tokei/lines/github/yoratoni/genesis?style=for-the-badge">
-        <img src="https://img.shields.io/github/languages/code-size/yoratoni/genesis?style=for-the-badge">
+        <img src="https://img.shields.io/tokei/lines/github/yoratoni/genesis?style=flat-square">
+        <img src="https://img.shields.io/github/languages/code-size/yoratoni/genesis?style=flat-square">
     </p>
 <br/>
