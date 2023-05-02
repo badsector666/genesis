@@ -17,7 +17,9 @@ export const NETWORK_CONFIG = {
     latencyLimit: 100,                          // ms
     downloadLimit: 1,                           // Mo/s
     uploadLimit: 1,                             // Mo/s
-    database: "bots"                            // Database name
+
+    // List of MongoDB collections
+    botObjectsCollection: "bot_objects"         // Collection for the bot objects
 };
 
 /**

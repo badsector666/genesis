@@ -150,7 +150,7 @@ export async function closeDBConnection(mongoClient: MongoClient) {
  */
 async function checkBotObjectExistenceInDB(mongoDB: Db, botIdentifier: string) {
     try {
-        const result = await mongoDB.collection(NETWORK_CONFIG.database).findOne({
+        const result = await mongoDB.collection(NETWORK_CONFIG.botObjectsCollection).findOne({
             _id: ObjectId.createFromHexString(botIdentifier)
         });
 
@@ -179,7 +179,7 @@ async function sendInitialBotObjectToDB(mongoDB: Db, botObject: NsBotObject.IsBo
         // Handle init time special
         botObject.specials.initTime = getCurrentDateString();
 
-        await mongoDB.collection(NETWORK_CONFIG.database).insertOne({
+        await mongoDB.collection(NETWORK_CONFIG.botObjectsCollection).insertOne({
             _id: ObjectId.createFromHexString(botObject.start.id),
             start: botObject.start,
             stop: botObject.stop,
@@ -205,7 +205,7 @@ async function getBotObjectFromDB(
     botObject: NsBotObject.IsBotObject
 ): Promise<NsBotObject.IsBotObject | null> {
     try {
-        const res = await mongoDB.collection(NETWORK_CONFIG.database).findOne({
+        const res = await mongoDB.collection(NETWORK_CONFIG.botObjectsCollection).findOne({
             _id: ObjectId.createFromHexString(botObject.start.id)
         });
 
@@ -272,7 +272,7 @@ export async function sendBotObjectCategory(
         // Handle last shared update special
         botObject.specials.lastSharedUpdate = getCurrentDateString();
 
-        await mongoDB.collection(NETWORK_CONFIG.database).updateOne(
+        await mongoDB.collection(NETWORK_CONFIG.botObjectsCollection).updateOne(
             {
                 _id: ObjectId.createFromHexString(botObject.start.id)
             },
