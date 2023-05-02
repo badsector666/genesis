@@ -1,4 +1,4 @@
-import ccxt from "ccxt";
+import { Exchange, OHLCV } from "ccxt";
 
 import { fetchOHLCV } from "helpers/exchange";
 import { getTimeframe } from "helpers/inputs";
@@ -9,12 +9,12 @@ import logger from "utils/logger";
 export default class Cache {
     private _initialized = new Promise<void>(() => null);
 
-    private _exchange: ccxt.Exchange;
+    private _exchange: Exchange;
     private _tradingPair: string;
     private _timeframe: NsGeneral.IsTimeframe;
     private _nbTimeframe: number;
     private _ohlcvLimit: number;
-    private _ohlcv: ccxt.OHLCV[] = [];
+    private _ohlcv: OHLCV[] = [];
 
 
     /**
@@ -25,7 +25,7 @@ export default class Cache {
      * @param ohlcvLimit The limit of OHLCV candles.
      */
     constructor(
-        exchange: ccxt.Exchange,
+        exchange: Exchange,
         tradingPair: string,
         timeframe: NsGeneral.IsTimeframe,
 
@@ -54,7 +54,7 @@ export default class Cache {
         uniqueTimes.sort((a, b) => a - b);
 
         // Change the OHLCV array to match the unique times
-        const tempOHLCV: ccxt.OHLCV[] = [];
+        const tempOHLCV: OHLCV[] = [];
 
         for (let i = 0; i < uniqueTimes.length; i++) {
             const candle = this._ohlcv.find((candle) => candle[0] === uniqueTimes[i]);

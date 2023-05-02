@@ -1,4 +1,13 @@
-import ccxt from "ccxt";
+import {
+    Balance,
+    Balances,
+    Exchange,
+    OHLCV,
+    OrderBook,
+    Ticker,
+    Trade,
+    binance
+} from "ccxt";
 
 import { EXCHANGE_CONFIG } from "configs/global.config";
 import logger from "utils/logger";
@@ -24,13 +33,13 @@ export function parseTradingPair(tradingPair: string) {
  * **WARNING!** Should be called once per application.
  * @returns The exchange.
  */
-export function loadExchange(sandbox: boolean): ccxt.Exchange {
+export function loadExchange(sandbox: boolean): Exchange {
     const keys = {
         apiKey: sandbox ? EXCHANGE_CONFIG.sandboxApiKey : EXCHANGE_CONFIG.apiKey,
         secret: sandbox ? EXCHANGE_CONFIG.sandboxApiSecret : EXCHANGE_CONFIG.apiSecret
     };
 
-    const exchange = new ccxt.binance({
+    const exchange = new binance({
         apiKey: keys.apiKey,
         secret: keys.secret,
         enableRateLimit: true
@@ -57,7 +66,7 @@ export function loadExchange(sandbox: boolean): ccxt.Exchange {
  * @param fatal If the exchange is not reliable, should the application exit? (default: true)
  * @returns The status (boolean if status -> ok).
  */
-export async function checkExchangeStatus(exchange: ccxt.Exchange, fatal = true): Promise<boolean> {
+export async function checkExchangeStatus(exchange: Exchange, fatal = true): Promise<boolean> {
     let status;
 
     try {
@@ -90,7 +99,7 @@ export async function checkExchangeStatus(exchange: ccxt.Exchange, fatal = true)
  * @param exchange The exchange.
  * @returns The markets.
  */
-export async function loadMarkets(exchange: ccxt.Exchange): Promise<void> {
+export async function loadMarkets(exchange: Exchange): Promise<void> {
     await exchange.loadMarkets();
 
     // Log the market information
@@ -102,7 +111,7 @@ export async function loadMarkets(exchange: ccxt.Exchange): Promise<void> {
  * @param exchange The exchange.
  * @returns The balances.
  */
-export async function loadBalances(exchange: ccxt.Exchange): Promise<ccxt.Balances> {
+export async function loadBalances(exchange: Exchange): Promise<Balances> {
     const balances = await exchange.fetchBalance();
 
     // Log the balance information
@@ -117,7 +126,7 @@ export async function loadBalances(exchange: ccxt.Exchange): Promise<ccxt.Balanc
  * @param token The token.
  * @returns The balance.
  */
-export function getBalance(balances: ccxt.Balances, token: string): ccxt.Balance {
+export function getBalance(balances: Balances, token: string): Balance {
     const balance = balances[token];
 
     // Log the balance information
@@ -132,7 +141,7 @@ export function getBalance(balances: ccxt.Balances, token: string): ccxt.Balance
  * @param symbol The symbol.
  * @returns The ticker.
  */
-export async function fetchTicker(exchange: ccxt.Exchange, symbol: string): Promise<ccxt.Ticker> {
+export async function fetchTicker(exchange: Exchange, symbol: string): Promise<Ticker> {
     const ticker = await exchange.fetchTicker(symbol);
 
     // Log the ticker information
@@ -147,7 +156,7 @@ export async function fetchTicker(exchange: ccxt.Exchange, symbol: string): Prom
  * @param symbol The symbol.
  * @returns The order book.
  */
-export async function fetchOrderBook(exchange: ccxt.Exchange, symbol: string): Promise<ccxt.OrderBook> {
+export async function fetchOrderBook(exchange: Exchange, symbol: string): Promise<OrderBook> {
     const orderBook = await exchange.fetchOrderBook(symbol);
 
     // Log the order book information
@@ -162,7 +171,7 @@ export async function fetchOrderBook(exchange: ccxt.Exchange, symbol: string): P
  * @param symbol The symbol.
  * @returns The trades.
  */
-export async function fetchTrades(exchange: ccxt.Exchange, symbol: string): Promise<ccxt.Trade[]> {
+export async function fetchTrades(exchange: Exchange, symbol: string): Promise<Trade[]> {
     const trades = await exchange.fetchTrades(symbol);
 
     // Log the trades information
@@ -181,12 +190,12 @@ export async function fetchTrades(exchange: ccxt.Exchange, symbol: string): Prom
  * @returns The OHLCV candles.
  */
 export async function fetchOHLCV(
-    exchange: ccxt.Exchange,
+    exchange: Exchange,
     symbol: string,
     timeframe = "1m",
     since: number | undefined = undefined,
     limit = 60
-): Promise<ccxt.OHLCV[]> {
+): Promise<OHLCV[]> {
     const ohlcv = await exchange.fetchOHLCV(symbol, timeframe, since, limit);
 
     // Log the OHLCV information
@@ -211,7 +220,7 @@ export async function fetchOHLCV(
  * @returns The fee.
  */
 export async function precalculateFees(
-    exchange: ccxt.Exchange,
+    exchange: Exchange,
     symbol: string,
     type: "market" | "limit",
     side: "buy" | "sell",
@@ -221,8 +230,13 @@ export async function precalculateFees(
     const ticker = await fetchTicker(exchange, symbol);
     const price = ticker.last;
 
+    if (typeof(price) !== "number") {
+        logger.error(`${exchange.name} price is not a number for ${symbol}.`);
+        process.exit(1);
+    }
+
     // Simulate the trade
-    const fee = await exchange.calculateFee(symbol, type, side, amount, price);
+    const fee = exchange.calculateFee(symbol, type, side, amount, price);
 
     // Log the fee information
     logger.verbose(`${exchange.name} fees measured for ${symbol} (${amount} x ${price}).`);
@@ -234,11 +248,14 @@ export async function precalculateFees(
     }
 
     // Add more readable fee information
-    fee.transactionCost = amount * price;
-    fee.tradingFee = fee.transactionCost * fee.rate;
-    fee.totalCost = fee.transactionCost + fee.tradingFee;
+    const extendedFee = {
+        ...fee,
+        transactionCost: amount * price,
+        tradingFee: (amount * price) * fee.rate,
+        totalCost: (amount * price) + ((amount * price) * fee.rate)
+    };
 
-    return fee;
+    return extendedFee;
 }
 
 /**
@@ -246,7 +263,7 @@ export async function precalculateFees(
  * @param exchange The exchange.
  * @returns The time (UNIX).
  */
-export async function exchangeTimeDifference(exchange: ccxt.Exchange): Promise<number> {
+export async function exchangeTimeDifference(exchange: Exchange): Promise<number> {
     let fetchTimeDelay = performance.now();
     const serverTime = await exchange.fetchTime();
     fetchTimeDelay = performance.now() - fetchTimeDelay;

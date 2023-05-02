@@ -1,4 +1,8 @@
-import ccxt from "ccxt";
+import {
+    Balance,
+    Balances,
+    Exchange,
+} from "ccxt";
 import { Db } from "mongodb";
 
 import Cache from "classes/cache";
@@ -22,9 +26,9 @@ declare namespace NsBotObject {
 
         tradingPair: string;
         baseCurrency: string;
-        baseBalance: ccxt.Balance | null;
+        baseBalance: Balance | null;
         quoteCurrency: string;
-        quoteBalance: ccxt.Balance | null;
+        quoteBalance: Balance | null;
         initialQuoteBalance: number;
 
         lastStartTime: string;
@@ -72,8 +76,8 @@ declare namespace NsBotObject {
         stringTimeframe: NsGeneral.IsTimeframe;
         running: boolean;
         networkCheck: boolean;
-        exchange: ccxt.Exchange | null;
-        balances: ccxt.Balances | null;
+        exchange: Exchange | null;
+        balances: Balances | null;
         cache: Cache | null;
     }
 

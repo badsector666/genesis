@@ -1,4 +1,4 @@
-import ccxt from "ccxt";
+import { Exchange } from "ccxt";
 import { Db } from "mongodb";
 
 import Cache from "classes/cache";
@@ -193,7 +193,7 @@ export default class Bot {
             // Because the bot could be stopped during the loop
             if (this._botObject.local.running && this._mongoDB.mongoDB) {
                 this._botObject.specials.timeDifference = await exchangeTimeDifference(
-                    this._botObject.local.exchange as ccxt.Exchange
+                    this._botObject.local.exchange as Exchange
                 );
 
                 // General shared object update
