@@ -7,8 +7,6 @@ import logger from "utils/logger";
 
 
 export default class Cache {
-    private _initialized = new Promise<void>(() => null);
-
     private _exchange: Exchange;
     private _tradingPair: string;
     private _timeframe: NsGeneral.IsTimeframe;
