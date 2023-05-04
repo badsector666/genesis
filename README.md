@@ -12,7 +12,7 @@
         <img src="https://img.shields.io/github/license/yoratoni/bibobot?color=D962F2&style=flat-square">
     </a>
     <a href="https://github.com/yoratoni/genesis/issues" target="_blank">
-        <img src="https://img.shields.io/nycrc/yoratoni/bibobot?color=FF8D70&config=.%2Fpackages%2Fserver%2Fpackage.json&label=coverage&style=flat-square">
+        <img src="https://img.shields.io/github/issues-raw/yoratoni/genesis?color=FF8D70&style=flat-square">
     </a>
     <a href="https://github.com/yoratoni/genesis/blob/main/package.json" target="_blank">
         <img src="https://img.shields.io/github/package-json/v/yoratoni/genesis?color=FDD384&style=flat-square">
