@@ -3,6 +3,10 @@
 # IDE
 **/.vscode
 
+# NYC
+**/.nyc_output
+**/coverage
+
 # Logs
 **/logs
 

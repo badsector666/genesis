@@ -9,7 +9,7 @@
     "scripts": {
         "start": "ts-node src/scripts/main.ts",
         "test": "mocha --require ts-node/register src/tests/*.test.ts",
-        "code-coverage": "nyc mocha --require ts-node/register src/tests/*.test.ts"
+        "test:coverage": "nyc yarn test"
     },
     "dependencies": {
         "ccxt": "^3.0.86",
@@ -22,6 +22,7 @@
         "winston": "^3.8.2"
     },
     "devDependencies": {
+        "@istanbuljs/nyc-config-typescript": "^1.0.2",
         "@total-typescript/ts-reset": "^0.4.2",
         "@types/chai": "^4.3.5",
         "@types/mocha": "^10.0.1",
