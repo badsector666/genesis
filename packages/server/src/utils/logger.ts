@@ -1,6 +1,6 @@
 import { createLogger, format, transports } from "winston";
 
-import { GENERAL_CONFIG } from "configs/global.config";
+import { GENERAL_CONFIG } from "../configs/global.config";
 
 
 /**

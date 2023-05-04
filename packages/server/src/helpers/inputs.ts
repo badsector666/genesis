@@ -4,9 +4,9 @@ import * as readline from "readline";
 import date from "date-and-time";
 import { ObjectId } from "mongodb";
 
-import { GENERAL_CONFIG } from "configs/global.config";
-import NsGeneral from "types/general";
-import logger from "utils/logger";
+import { GENERAL_CONFIG } from "../configs/global.config";
+import NsGeneral from "../types/general";
+import logger from "../utils/logger";
 
 
 /**
@@ -32,7 +32,6 @@ export function getObjectId(sandbox: boolean, name: string) {
 
     return ObjectId.createFromHexString(ID).toString("hex");
 }
-
 
 /**
  * Asks the user for input and returns the answer.

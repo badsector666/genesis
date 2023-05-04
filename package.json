@@ -12,6 +12,8 @@
     "scripts": {
         "client:start": "yarn workspace client start",
         "client:build": "yarn workspace client build",
+        "server:code-coverage": "yarn workspace server code-coverage",
+        "server:test": "yarn workspace server test",
         "server:start": "yarn workspace server start"
     }
 }
