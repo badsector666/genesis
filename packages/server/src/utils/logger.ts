@@ -8,7 +8,7 @@ import { GENERAL_CONFIG } from "../configs/global.config";
  */
 const loggerFormat = format.combine(
     format.timestamp({
-        format: "YYYY-MM-DD HH:mm:ss"
+        format: GENERAL_CONFIG.dateFormat
     }),
     format.printf((info) => {
         return `[${info.timestamp}] [${info.level.toUpperCase()}] ${
