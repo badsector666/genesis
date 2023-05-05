@@ -5,8 +5,6 @@ import Cache from "classes/cache";
 import { botObject } from "configs/bot.config";
 import { EXCHANGE_CONFIG, GENERAL_CONFIG } from "configs/global.config";
 import {
-} from "utils/algorithm";
-import {
     checkExchangeStatus,
     exchangeTimeDifference,
     getBalance,
