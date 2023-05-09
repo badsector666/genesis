@@ -1,4 +1,5 @@
 import { Exchange } from "ccxt";
+import lodash from "lodash";
 import { Db } from "mongodb";
 
 import Cache from "classes/cache";
@@ -32,7 +33,7 @@ import logger from "utils/logger";
 
 
 export default class Bot {
-    private _botObject = botObject;
+    private _botObject = lodash.cloneDeep(botObject);
     private _mongoDB: NsBotObject.IsMongoDB = {
         mongoClient: null,
         mongoDB: null

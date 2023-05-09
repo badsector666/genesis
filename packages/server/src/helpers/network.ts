@@ -98,15 +98,15 @@ export async function checkNetwork(fatal = true): Promise<boolean> {
  * @param fatal If the connection fails, should the application exit? (default: true)
  * @returns The MongoDB database.
  */
-export async function connectToDB(fatal = true) {
+export async function connectToDB(fatal = true, databaseName = process.env.MONGODB_DB) {
     const uri = `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASS}@${process.env.MONGODB_HOST}`;
     const mongoClient = new MongoClient(uri, {});
 
     try {
         await mongoClient.connect();
-        const mongoDB = mongoClient.db(process.env.MONGODB_DB);
+        const mongoDB = mongoClient.db(databaseName);
 
-        logger.info(`Successfully connected to the MongoDB database [${process.env.MONGODB_DB}].`);
+        logger.info(`Successfully connected to the MongoDB database [${databaseName}].`);
 
         return {
             mongoClient: mongoClient,
@@ -174,7 +174,7 @@ async function checkBotObjectExistenceInDB(mongoDB: Db, botIdentifier: string) {
  * @param mongoDB The MongoDB database.
  * @param botObject The bot object.
  */
-async function sendInitialBotObjectToDB(mongoDB: Db, botObject: NsBotObject.IsBotObject) {
+export async function sendInitialBotObjectToDB(mongoDB: Db, botObject: NsBotObject.IsBotObject) {
     try {
         // Handle init time special
         botObject.specials.initTime = getCurrentDateString();
@@ -200,7 +200,7 @@ async function sendInitialBotObjectToDB(mongoDB: Db, botObject: NsBotObject.IsBo
  * @param botObject The bot object.
  * @returns The bot object with shared vars recovered from database.
  */
-async function getBotObjectFromDB(
+export async function getBotObjectFromDB(
     mongoDB: Db,
     botObject: NsBotObject.IsBotObject
 ): Promise<NsBotObject.IsBotObject | null> {
