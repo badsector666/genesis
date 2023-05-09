@@ -5,6 +5,11 @@ import { expect } from "chai";
 import { describe, it } from "mocha";
 
 import * as exchange from "helpers/exchange";
+import logger from "utils/logger";
+
+
+// Silencing the logger
+logger.transports.forEach((t) => (t.silent = true));
 
 
 describe("exchange.ts", () => {

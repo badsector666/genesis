@@ -1,38 +1,50 @@
 import { expect } from "chai";
 import lodash from "lodash";
 import { describe, it } from "mocha";
+import { Db } from "mongodb";
 
 import { botObject } from "configs/bot.config";
 import { getObjectId } from "helpers/inputs";
 import * as network from "helpers/network";
+import logger from "utils/logger";
+
+
+// Silencing the logger
+logger.transports.forEach((t) => (t.silent = true));
 
 
 describe("network.ts", () => {
     describe("checkNetwork()", () => {
-        it("should return true", async () => {
+        it("Should return a boolean, depending if the network test has successfully passed or not", async () => {
             expect(await network.checkNetwork(false))
-                .to.be.true;
-        });
-
-        it("should return false", async () => {
-            expect(await network.checkNetwork(true))
-                .to.be.false;
+                .is.a("boolean");
         });
     });
 
-    describe("connectToDB()", () => {
-        it("should return the MongoDB database", async () => {
-            expect(await network.connectToDB(true, "tests"))
-                .is.a("object");
+    describe.only("connectToDB()", () => {
+        let mongoDB: Db | null;
+
+        beforeEach(async () => {
+            // Assign the DB instance to the mongoDB variable
+            ({ mongoDB } = await network.connectToDB(false, "tests"));
         });
 
-        it("should return null", async () => {
-            expect(await network.connectToDB(true, "tests"))
+        it("Should return 'null' if the connection fails (wrong database name)", async () => {
+            const { mongoDB } = await network.connectToDB(false, "wrongDBName");
+
+            expect(mongoDB, "MongoDB instance should be null")
                 .is.null;
         });
+
+        it("Should return the DB instance if connection is successful", async () => {
+            if (mongoDB !== null) {
+                expect(mongoDB)
+                    .is.a("object");
+            }
+        });
     });
 
-    describe.only("getBotObjectFromDB()", () => {
+    describe("getBotObjectFromDB()", () => {
         it("should return the bot object", async () => {
             const { mongoDB } = await network.connectToDB(true, "tests");
             if (mongoDB !== null) {

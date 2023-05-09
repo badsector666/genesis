@@ -4,6 +4,11 @@ import { describe, it } from "mocha";
 
 import { GENERAL_CONFIG } from "configs/global.config";
 import * as inputs from "helpers/inputs";
+import logger from "utils/logger";
+
+
+// Silencing the logger
+logger.transports.forEach((t) => (t.silent = true));
 
 
 describe("inputs.ts", () => {

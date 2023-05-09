@@ -8,7 +8,7 @@
     "private": true,
     "scripts": {
         "start": "ts-node src/scripts/main.ts",
-        "test": "mocha --timeout 65000 --require mocha-suppress-logs --require node_modules/ts-node/register src/tests/*.test.ts",
+        "test": "mocha --exit --timeout 65000 --require node_modules/ts-node/register src/tests/*.test.ts",
         "test:coverage": "nyc yarn test"
     },
     "dependencies": {
@@ -38,7 +38,6 @@
         "eslint-import-resolver-typescript": "^3.5.5",
         "eslint-plugin-import": "^2.27.5",
         "mocha": "^10.2.0",
-        "mocha-suppress-logs": "^0.3.1",
         "nyc": "^15.1.0",
         "ts-node": "^10.9.1",
         "tsconfig-paths": "^4.2.0",
