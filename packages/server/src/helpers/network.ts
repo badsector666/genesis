@@ -104,6 +104,25 @@ export async function connectToDB(fatal = true, databaseName = process.env.MONGO
 
     try {
         await mongoClient.connect();
+
+        const listOfDatabases = await mongoClient.db().admin().listDatabases();
+
+        // Verify if the database exist inside the MongoDB cluster
+        if (listOfDatabases.databases.some((database) => database.name === databaseName)) {
+            logger.verbose(`Database [${databaseName}] found.`);
+        } else {
+            logger.error(`Database [${databaseName}] not found.`);
+
+            if (fatal) {
+                process.exit(1);
+            } else {
+                return {
+                    mongoClient: null,
+                    mongoDB: null
+                };
+            }
+        }
+
         const mongoDB = mongoClient.db(databaseName);
 
         logger.info(`Successfully connected to the MongoDB database [${databaseName}].`);
@@ -148,7 +167,7 @@ export async function closeDBConnection(mongoClient: MongoClient) {
  * @param botIdentifier The bot object identifier (objectID from MongoDB).
  * @returns If the bot object exist.
  */
-async function checkBotObjectExistenceInDB(mongoDB: Db, botIdentifier: string) {
+export async function checkBotObjectExistenceInDB(mongoDB: Db, botIdentifier: string) {
     try {
         const result = await mongoDB.collection(NETWORK_CONFIG.botObjectsCollection).findOne({
             _id: ObjectId.createFromHexString(botIdentifier)
