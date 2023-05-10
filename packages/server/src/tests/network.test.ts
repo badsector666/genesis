@@ -8,7 +8,7 @@ import { NETWORK_CONFIG } from "configs/global.config";
 import { getObjectId } from "helpers/inputs";
 import * as network from "helpers/network";
 import logger from "utils/logger";
-import { generateRandomBotName } from "utils/random";
+import { generateRandomBotName, generateRandomNumber } from "utils/random";
 
 
 // Silencing the logger
@@ -226,6 +226,7 @@ describe("network.ts", () => {
                 // Il faut que tu testes le contenu du bot, pas juste le nom,
                 // par exemple dans le test au dessus, change aussi "start.initialQuoteBalance" par une valeur random
                 // que tu stockes dans une variable, et ici, tu testes que la valeur est la même
+                // je t'ai fait une fonction pour ça aussi dans "utils/random", "generateRandomNumber"
                 // Et ici laisse la valeur par défaut
                 // Comme ça, si par exemple start.initialQuoteBalance = 0, ça veut dire que c'est un nouveau bot
                 // Et si start.initialQuoteBalance = 1000, ça veut dire que c'est le même bot
