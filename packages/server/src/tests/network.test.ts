@@ -14,11 +14,6 @@ import { generateRandomBotName, generateRandomNumber } from "utils/random";
 // Silencing the logger
 logger.transports.forEach((t) => (t.silent = true));
 
-// TODO: Tu pensera à enlever tout les commentaires que j'ai mis pour t'expliquer
-
-// TODO: Tu peux rajouter des messages d'erreur dans les "expect" pour que ce soit plus clair
-// Essaie de te baser sur les tests que j'ai fait là pour faire les tiens
-
 describe("network.ts", () => {
     const randomBotName = generateRandomBotName();
 
@@ -58,7 +53,7 @@ describe("network.ts", () => {
                 const collections = await mongoDB.collections();
                 const collectionNames = collections.map((collection) => collection.collectionName);
 
-                expect(collectionNames.includes(NETWORK_CONFIG.botObjectsCollection), "The collection name Should be in the list of collections")
+                expect(collectionNames.includes(NETWORK_CONFIG.botObjectsCollection), "The collection name should be in the list of collections")
                     .to.be.true;
             }
         });
@@ -207,16 +202,16 @@ describe("network.ts", () => {
                 const testBotObject = lodash.cloneDeep(botObject);
                 const botName = randomBotName;
                 const sandbox = true;
-                const IQB = generateRandomNumber(1000,10000);
+                const IQB = generateRandomNumber(1000, 10000);
 
                 testBotObject.start.name = botName;
                 testBotObject.start.id = getObjectId(sandbox, testBotObject.start.name);
                 testBotObject.start.sandbox = sandbox;
                 testBotObject.start.initialQuoteBalance = IQB;
 
-                const sendOrGet = network.sendOrGetInitialBotObject(mongoDB, testBotObject);
+                const sendOrGet = await network.sendOrGetInitialBotObject(mongoDB, testBotObject);
 
-                expect((await sendOrGet).start.initialQuoteBalance,"The bot should exist in the DB")
+                expect(sendOrGet.start.initialQuoteBalance,"The bot should exist in the DB")
                     .is.greaterThan(0);
             }
 
