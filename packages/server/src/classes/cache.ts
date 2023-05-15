@@ -126,7 +126,13 @@ export default class Cache {
 
             await this.load();
         }
+    }
 
-        console.log(this._ohlcv);
+    /**
+     * Returns the OHLCV candles.
+     * @returns The OHLCV candles.
+     */
+    public async getOHLCV(): Promise<OHLCV[]> {
+        return this._ohlcv;
     }
 }
