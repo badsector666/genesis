@@ -85,3 +85,10 @@ This fallback system used to prevent the SP from making stupid trades works on t
 #### Strategy Pool (SP):
 This system contains all the strategies used to decide whether a trade should be made or not.
 It is using the scoring system to weight the strategies, creating a basic governance system.
+
+Communication System
+--------------------
+For the bot to communicate with the client, two systems are used:
+- The database: Contains all the data of the bot, including the logs and how it is performing, etc.
+  It is used by the client to display the data to the user.
+- The API: This system is used to allow the client to control the bot and send commands to it.
