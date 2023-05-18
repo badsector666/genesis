@@ -18,6 +18,22 @@ declare namespace NsBotObject {
         mongoDB: Db | null;
     }
 
+    /**
+     * Interface for a trade object (contains info about a trade).
+     */
+    interface IsTradeObject {
+        timestamp: number;
+        date: string;
+        currency: string;
+        side: string;
+        price: number;
+        amount: number;
+        fee: number;
+    }
+
+    /**
+     * botObject start interface.
+     */
     interface IsBotObjectStart {
         name: string;
         id: string;
@@ -34,18 +50,28 @@ declare namespace NsBotObject {
         lastStartTime: string;
     }
 
+    /**
+     * botObject stop interface.
+     */
     interface IsBotObjectStop {
         lastStopTime: string;
     }
 
+    /**
+     * botObject shared arrays interface.
+     */
     interface IsBotObjectSharedArrays {
         tradeSizes: number[];
         tradeDurations: number[];
         tradeProfits: number[];
         feesPerTrade: number[];
         dailyProfits: number[];
+        history: IsTradeObject[];
     }
 
+    /**
+     * botObject shared interface.
+     */
     interface IsBotObjectShared {
         arrays: IsBotObjectSharedArrays;
 
@@ -71,6 +97,9 @@ declare namespace NsBotObject {
         avgDailyProfitPercentage: number;
     }
 
+    /**
+     * botObject local interface.
+     */
     interface IsBotObjectLocal {
         initialized: Promise<void>;
         stringTimeframe: NsGeneral.IsTimeframe;
@@ -81,6 +110,9 @@ declare namespace NsBotObject {
         cache: Cache | null;
     }
 
+    /**
+     * botObject specials interface.
+     */
     interface IsBotObjectSpecials {
         initTime: string;
         lastSharedUpdate: string;
@@ -89,6 +121,9 @@ declare namespace NsBotObject {
         timeDifference: number;
     }
 
+    /**
+     * botObject main interface.
+     */
     interface IsBotObject {
         start: IsBotObjectStart;
         stop: IsBotObjectStop;

@@ -3,7 +3,7 @@ import lodash from "lodash";
 import { describe, it } from "mocha";
 import { Db, MongoClient } from "mongodb";
 
-import { botObject } from "configs/bot.config";
+import { botObject } from "configs/botObject.config";
 import { NETWORK_CONFIG } from "configs/global.config";
 import { getObjectId } from "helpers/inputs";
 import * as network from "helpers/network";

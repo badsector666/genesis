@@ -2,6 +2,22 @@ import NsBotObject from "types/botObject";
 
 
 /**
+ * The trade object, containing info about a trade.
+ *
+ * This object is used as a base to create a trade object to be sent to the database
+ * under the "shared" category, "arrays" subcategory, inside the "history" array.
+ */
+export const tradeObject: NsBotObject.IsTradeObject = {
+    timestamp: 0,                          // Timestamp of the trade (Unix timestamp in ms)
+    date: "",                              // Date of the trade (dateFormat)
+    currency: "",                          // Trade currency (base or quote currency name)
+    side: "",                              // Trade side ("BUY" or "SELL")
+    price: 0,                              // Trade price
+    amount: 0,                             // Trade amount
+    fee: 0                                 // Trade fee
+};
+
+/**
  * The bot object, working with the database to sync and store data.
  *
  * This object contains multiple categories, each one with a specific purpose:
@@ -44,6 +60,7 @@ export const botObject: NsBotObject.IsBotObject = {
             tradeProfits: [],              // Trade profits
             feesPerTrade: [],              // Fees per trade
             dailyProfits: [],              // Daily profits
+            history: [],                   // Trade history
         },
 
         // Iterations

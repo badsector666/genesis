@@ -3,7 +3,7 @@ import lodash from "lodash";
 import { Db } from "mongodb";
 
 import Cache from "classes/cache";
-import { botObject } from "configs/bot.config";
+import { botObject } from "configs/botObject.config";
 import { EXCHANGE_CONFIG, GENERAL_CONFIG } from "configs/global.config";
 import {
     checkExchangeStatus,
