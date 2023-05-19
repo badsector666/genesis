@@ -121,7 +121,7 @@ BOT
         |-> Profit Calculator
         |-> Stop Loss
         |
-        |-> Strategy Pool (SP) (Governance System with weight given by HSS)
+        |-> Strategy Pool (SP) (HSS Weighted Governance)
             |
             |-> Strategies Controller (SC)
                 |
