@@ -72,6 +72,10 @@ and do some basic checks, its interval is based on 4 times the timeframe of the 
 This is the primary loop of the bot, this is where the magic happens.
 This loop contains the RMS, itself containing the SP, and the trading system.
 
+Systems
+-------
+More details about the systems used by the bot.
+
 #### Historical Scoring System (HSS):
 This system is used to calculate the score of a strategy based on its performance on historical data.
 
@@ -85,6 +89,46 @@ This fallback system used to prevent the SP from making stupid trades works on t
 #### Strategy Pool (SP):
 This system contains all the strategies used to decide whether a trade should be made or not.
 It is using the scoring system to weight the strategies, creating a basic governance system.
+
+#### Strategies Controller (SC):
+This system is used to control each strategy by sending it the data it needs to work and
+receiving the data it produces. It is also used to calculate the score of each strategy.
+
+#### Strategy (S):
+This is the basic system of the bot, it is used to decide whether a trade should be made or not.
+The bot implements multiple strategies, each one is a set of rules that are applied to the market.
+
+Overall Schematic
+-----------------
+```
+BOT
+|
+|-> Historical Scoring System (HSS)
+|   |
+|   |-> Gives a score for each strategy
+|       |
+|       |-> Sent to the Strategy Pool (SP)
+|
+|-> General Loop
+|   |
+|   |-> Measures time diff between local and server time
+|   |-> Updates the values of the bot in the database
+|
+|-> Main Loop
+    |
+    |-> Risk Management System (RMS)
+        |
+        |-> Profit Calculator
+        |-> Stop Loss
+        |
+        |-> Strategy Pool (SP) (Governance System with weight given by HSS)
+            |
+            |-> Strategies Controller (SC)
+                |
+                |-> Strategy (S)
+                |-> Strategy (S)
+                |-> ...
+```
 
 Communication System
 --------------------
