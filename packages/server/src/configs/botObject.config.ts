@@ -43,6 +43,9 @@ export const botObject: NsBotObject.IsBotObject = {
         quoteBalance: null,                // Quote balance
         initialQuoteBalance: 0,            // Initial quote balance to start with
 
+        // OHLCV
+        ohlcvLimit: 0,                     // OHLCV limit (in number of candles)
+
         // Timestamps
         lastStartTime: "",                 // Last start time
         timeframe: 0,                      // Timeframe  (in ms)
@@ -94,7 +97,7 @@ export const botObject: NsBotObject.IsBotObject = {
         initialized: new Promise<void>(() => null),
 
         // Timeframe
-        stringTimeframe: "1m", // Timeframe (in string format)
+        stringTimeframe: "1m",             // Timeframe (in string format)
 
         // Bot statuses
         running: false,                    // If the bot is running

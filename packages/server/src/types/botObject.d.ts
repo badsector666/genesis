@@ -38,6 +38,7 @@ declare namespace NsBotObject {
         name: string;
         id: string;
         timeframe: number;
+        ohlcvLimit: number;
         sandbox: boolean;
 
         tradingPair: string;

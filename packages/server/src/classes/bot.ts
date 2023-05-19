@@ -47,7 +47,8 @@ export default class Bot {
      * @param name The bot name (used for bot ID inside the database).
      * @param sandbox If the bot should run in sandbox mode.
      * @param initialQuoteBalance The initial quote balance to start with.
-     * @param timeframe The timeframe to use.
+     * @param timeframe The timeframe to use (optional, defaults to 1m).
+     * @param ohlcvLimit The limit of OHLCV candles (optional, defaults to 128).
      * @returns The bot instance.
      */
     constructor(
@@ -55,7 +56,8 @@ export default class Bot {
         name: string,
         sandbox = true,
         initialQuoteBalance = 0,
-        timeframe: NsGeneral.IsTimeframe = "1m"
+        timeframe: NsGeneral.IsTimeframe = "1m",
+        ohlcvLimit = 128
     ) {
         // Sandbox mode overrides the trading pair
         // As most of currencies are not available in sandbox mode
@@ -78,6 +80,7 @@ export default class Bot {
         // Timestamps
         this._botObject.local.stringTimeframe = timeframe;
         this._botObject.start.timeframe = getTimeframe(timeframe);
+        this._botObject.start.ohlcvLimit = ohlcvLimit;
 
         // Logging
         logger.info(`New "${name}" bot instance for ${tradingPair} created.`);
@@ -165,7 +168,7 @@ export default class Bot {
                 this._botObject.local.exchange,
                 this._botObject.start.tradingPair,
                 this._botObject.local.stringTimeframe,
-                4
+                this._botObject.start.ohlcvLimit
             );
 
             // Load the initial cache
