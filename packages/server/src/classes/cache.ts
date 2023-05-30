@@ -129,10 +129,10 @@ export default class Cache {
     }
 
     /**
-     * Returns the OHLCV candles.
+     * Gets the OHLCV candles.
      * @returns The OHLCV candles.
      */
-    public async getOHLCV(): Promise<OHLCV[]> {
+    public get ohlcv(): OHLCV[] {
         return this._ohlcv;
     }
 }

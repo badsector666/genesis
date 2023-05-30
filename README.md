@@ -79,6 +79,8 @@ More details about the systems used by the bot.
 #### Historical Scoring System (HSS):
 This system is used to calculate the score of a strategy based on its performance on historical data.
 
+Can be found inside `src/classes/systems/HSS.ts`.
+
 #### Risk Management System (RMS):
 This fallback system used to prevent the SP from making stupid trades works on two basic systems:
 - The profit calculator: This system is used to calculate the profit including fees of a trade,
@@ -86,17 +88,25 @@ This fallback system used to prevent the SP from making stupid trades works on t
 - The stop loss: This system is used to prevent the bot from losing money if the SP is not performing well,
   meaning that the RMS is the only system that can, in fact, make the bot lose money.
 
+Can be found inside `src/classes/systems/RMS.ts`.
+
 #### Strategy Pool (SP):
 This system contains all the strategies used to decide whether a trade should be made or not.
 It is using the scoring system to weight the strategies, creating a basic governance system.
 
-#### Strategies Controller (SC):
-This system is used to control each strategy by sending it the data it needs to work and
-receiving the data it produces. It is also used to calculate the score of each strategy.
+It is also used to control each strategy by sending it the data it needs to work and
+receiving the data it produces.
+
+Can be found inside `src/classes/systems/SP.ts`.
 
 #### Strategy (S):
 This is the basic system of the bot, it is used to decide whether a trade should be made or not.
 The bot implements multiple strategies, each one is a set of rules that are applied to the market.
+
+Notes:
+- The strategy name should be in the format `strategy_<name>.ts`.
+- The strategy should be implemented inside `src/classes/strategies/`.
+- The strategy should be extended from the `Strategy` class (see `src/classes/strategies/strategy.ts`).
 
 Overall Schematic
 -----------------
@@ -123,11 +133,9 @@ BOT
         |
         |-> Strategy Pool (SP) (HSS Weighted Governance)
             |
-            |-> Strategies Controller (SC)
-                |
-                |-> Strategy (S)
-                |-> Strategy (S)
-                |-> ...
+            |-> Strategy (S)
+            |-> Strategy (S)
+            |-> ...
 ```
 
 Communication System

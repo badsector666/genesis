@@ -224,6 +224,16 @@ export default class Bot {
                 await this._botObject.local.cache.update();
             }
 
+            // TODO: Add a simple strategy for test
+
+            const OHLCV = this._botObject.local.cache?.ohlcv;
+
+            if (OHLCV) {
+                // Implement a simple strategy
+                // const strategyJesus = new JesusStrategy();
+                // const result = strategyJesus.run(OHLCV);
+            }
+
             // Calls the strategy pool, which will call the strategies
             // Should decide if the data are recovered here or in the strategy pool
             // Note that a part of the data are necessary at this level for trailing stop loos
