@@ -3,7 +3,7 @@ import "configs/env";
 import Bot from "classes/bot";
 
 
-const bot = new Bot("MATIC/USDT", "R&D", true, 20, "1s");
+const bot = new Bot("MATIC/USDT", "R&D", true, 20, "1d");
 
 bot.start();
 

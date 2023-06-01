@@ -1,8 +1,10 @@
 import { Exchange } from "ccxt";
+import { priceBar } from "ccxt/js/src/base/types";
 import lodash from "lodash";
 import { Db } from "mongodb";
 
 import Cache from "classes/cache";
+import Strategy from "classes/strategies/strategy";
 import { botObject } from "configs/botObject.config";
 import { EXCHANGE_CONFIG, GENERAL_CONFIG } from "configs/global.config";
 import {
@@ -27,6 +29,7 @@ import {
     sendBotObjectCategory,
     sendOrGetInitialBotObject
 } from "helpers/network";
+import { convertOHLCVToPriceBar } from "helpers/strategy";
 import NsBotObject from "types/botObject";
 import NsGeneral from "types/general";
 import logger from "utils/logger";
@@ -226,12 +229,19 @@ export default class Bot {
 
             // TODO: Add a simple strategy for test
 
-            const OHLCV = this._botObject.local.cache?.ohlcv;
+            const OHLCVs = this._botObject.local.cache?.ohlcv;
 
-            if (OHLCV) {
-                // Implement a simple strategy
-                // const strategyJesus = new JesusStrategy();
-                // const result = strategyJesus.run(OHLCV);
+            const priceBars: Array<priceBar> = [];
+
+            if (OHLCVs) {
+                for (const row of OHLCVs) {
+                    priceBars.push(convertOHLCVToPriceBar(row));
+                }
+
+                const strategy = new Strategy();
+
+                const result = strategy.run(priceBars);
+                logger.warn(result);
             }
 
             // Calls the strategy pool, which will call the strategies

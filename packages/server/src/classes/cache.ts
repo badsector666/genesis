@@ -1,4 +1,5 @@
 import { Exchange, OHLCV } from "ccxt";
+import { priceBar } from "ccxt/js/src/base/types";
 
 import { fetchOHLCV } from "helpers/exchange";
 import { getTimeframe } from "helpers/inputs";
@@ -12,7 +13,8 @@ export default class Cache {
     private _timeframe: NsGeneral.IsTimeframe;
     private _nbTimeframe: number;
     private _ohlcvLimit: number;
-    private _ohlcv: OHLCV[] = [];
+    private _OHLCVs: OHLCV[] = [];
+    private _priceBars: priceBar[] = [];
 
 
     /**
@@ -45,7 +47,7 @@ export default class Cache {
      */
     private async _sortOHLCV(): Promise<boolean> {
         // Remove the oldest candles while also removing the duplicates
-        const savedTimes = this._ohlcv.map((candle) => candle[0]);
+        const savedTimes = this._OHLCVs.map((candle) => candle[0]);
         const uniqueTimes = [...new Set(savedTimes)];
 
         // Sorts the unique times by security
@@ -55,7 +57,7 @@ export default class Cache {
         const tempOHLCV: OHLCV[] = [];
 
         for (let i = 0; i < uniqueTimes.length; i++) {
-            const candle = this._ohlcv.find((candle) => candle[0] === uniqueTimes[i]);
+            const candle = this._OHLCVs.find((candle) => candle[0] === uniqueTimes[i]);
 
             if (candle) {
                 tempOHLCV[i] = candle;
@@ -82,7 +84,7 @@ export default class Cache {
         }
 
         // Apply the new OHLCV array
-        this._ohlcv = tempOHLCV;
+        this._OHLCVs = tempOHLCV;
 
         return true;
     }
@@ -91,7 +93,7 @@ export default class Cache {
      * Loads the cache.
      */
     public async load(): Promise<void> {
-        this._ohlcv = await fetchOHLCV(
+        this._OHLCVs = await fetchOHLCV(
             this._exchange,
             this._tradingPair,
             this._timeframe,
@@ -104,7 +106,7 @@ export default class Cache {
      * Updates the cache.
      */
     public async update(): Promise<void> {
-        const lastCandleTime = this._ohlcv[this._ohlcv.length - 1][0];
+        const lastCandleTime = this._OHLCVs[this._OHLCVs.length - 1][0];
 
         const newCandles = await fetchOHLCV(
             this._exchange,
@@ -115,14 +117,14 @@ export default class Cache {
         );
 
         // Add raw new candles to the OHLCV array before sorting
-        this._ohlcv.push(...newCandles);
+        this._OHLCVs.push(...newCandles);
 
         // Sort the OHLCV candles by time
         const areCandlesCorrect = await this._sortOHLCV();
 
         // If the candles are not correct, reload the cache
         if (!areCandlesCorrect) {
-            logger.warning("The OHLCV candles are not correct, reloading the cache...");
+            logger.warn("The OHLCV candles are not correct, reloading the cache...");
 
             await this.load();
         }
@@ -133,6 +135,6 @@ export default class Cache {
      * @returns The OHLCV candles.
      */
     public get ohlcv(): OHLCV[] {
-        return this._ohlcv;
+        return this._OHLCVs;
     }
 }
