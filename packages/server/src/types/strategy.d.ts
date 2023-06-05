@@ -1,34 +1,18 @@
 declare namespace NsStrategy {
-
-    interface OHLCV {
+    /**
+     * Interface for a price bar (converted from OHLCV data array).
+     */
+    interface priceBar {
         timestamp: number;
         open: number;
         high: number;
         low: number;
         close: number;
         volume: number;
-    }
-
-    interface priceBar {
-        timestamp: OHLCV["timestamp"];
-        open: OHLCV["open"];
-        high: OHLCV["high"];
-        low: OHLCV["low"];
-        close: OHLCV["close"];
-        volume: OHLCV["volume"];
-        avgPrice: number;
-        medPrice: number;
-    }
-
-    /**
-         * A result object emitted by each strategy.
-         */
-    interface strategyResult {
-        strategy: string;
-        result: boolean;
-        profit: number;
+        pctChange: number | null;
+        price: number;
     }
 }
 
 
-export default Strategy;
+export default NsStrategy;

@@ -1,10 +1,8 @@
 import { Exchange } from "ccxt";
-import { priceBar } from "ccxt/js/src/base/types";
 import lodash from "lodash";
 import { Db } from "mongodb";
 
 import Cache from "classes/cache";
-import Strategy from "classes/strategies/strategy";
 import { botObject } from "configs/botObject.config";
 import { EXCHANGE_CONFIG, GENERAL_CONFIG } from "configs/global.config";
 import {
@@ -29,7 +27,6 @@ import {
     sendBotObjectCategory,
     sendOrGetInitialBotObject
 } from "helpers/network";
-import { convertOHLCVToPriceBar } from "helpers/strategy";
 import NsBotObject from "types/botObject";
 import NsGeneral from "types/general";
 import logger from "utils/logger";
@@ -205,7 +202,7 @@ export default class Bot {
                 this._botObject.shared.generalIterations += 1;
 
                 // Update the shared object
-                sendBotObjectCategory(this._mongoDB.mongoDB as Db, this._botObject, "shared");
+                await sendBotObjectCategory(this._mongoDB.mongoDB as Db, this._botObject, "shared");
             }
 
             await new Promise(resolve => setTimeout(
@@ -228,21 +225,12 @@ export default class Bot {
             }
 
             // TODO: Add a simple strategy for test
+            // const OHLCVs = this._botObject.local.cache?.OHLCVs;
+            const priceBars = this._botObject.local.cache?.priceBars;
 
-            const OHLCVs = this._botObject.local.cache?.ohlcv;
+            // console.log(OHLCVs);
+            console.log(priceBars);
 
-            const priceBars: Array<priceBar> = [];
-
-            if (OHLCVs) {
-                for (const row of OHLCVs) {
-                    priceBars.push(convertOHLCVToPriceBar(row));
-                }
-
-                const strategy = new Strategy();
-
-                const result = strategy.run(priceBars);
-                logger.warn(result);
-            }
 
             // Calls the strategy pool, which will call the strategies
             // Should decide if the data are recovered here or in the strategy pool
@@ -289,7 +277,7 @@ export default class Bot {
         this._botObject.start.lastStartTime = getCurrentDateString();
 
         // Update the shared object
-        sendBotObjectCategory(this._mongoDB.mongoDB as Db, this._botObject, "start");
+        await sendBotObjectCategory(this._mongoDB.mongoDB as Db, this._botObject, "start");
 
         await Promise.all([
             this._generalLoop(),

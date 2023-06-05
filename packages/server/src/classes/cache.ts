@@ -1,9 +1,10 @@
 import { Exchange, OHLCV } from "ccxt";
-import { priceBar } from "ccxt/js/src/base/types";
 
 import { fetchOHLCV } from "helpers/exchange";
 import { getTimeframe } from "helpers/inputs";
+import { convertOHLCVsToPriceBars } from "helpers/strategy";
 import NsGeneral from "types/general";
+import NsStrategy from "types/strategy";
 import logger from "utils/logger";
 
 
@@ -14,7 +15,7 @@ export default class Cache {
     private _nbTimeframe: number;
     private _ohlcvLimit: number;
     private _OHLCVs: OHLCV[] = [];
-    private _priceBars: priceBar[] = [];
+    private _priceBars: NsStrategy.priceBar[] = [];
 
 
     /**
@@ -100,6 +101,9 @@ export default class Cache {
             undefined,
             this._ohlcvLimit
         );
+
+        // Convert to price bars
+        this._priceBars = convertOHLCVsToPriceBars(this._OHLCVs);
     }
 
     /**
@@ -128,13 +132,24 @@ export default class Cache {
 
             await this.load();
         }
+
+        // Convert to price bars
+        this._priceBars = convertOHLCVsToPriceBars(this._OHLCVs);
     }
 
     /**
      * Gets the OHLCV candles.
      * @returns The OHLCV candles.
      */
-    public get ohlcv(): OHLCV[] {
+    public get OHLCVs(): OHLCV[] {
         return this._OHLCVs;
+    }
+
+    /**
+     * Gets the price bars.
+     * @returns The price bars.
+     */
+    public get priceBars(): NsStrategy.priceBar[] {
+        return this._priceBars;
     }
 }
