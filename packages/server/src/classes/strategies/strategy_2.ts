@@ -7,21 +7,29 @@ import logger from "utils/logger";
 export default class Strategy_2 extends Strategy {
 
     getLevels(timestamp: number, priceBars: Array<NsStrategy.priceBar>, first = true) {
+
+        const percentage = 0.002;
+
+
         for (const priceBar of priceBars) {
             if (priceBar.timestamp === timestamp) {
                 if (first) {
-                    return [priceBar.open * 0.998, priceBar.open * 1.002];
+                    return [priceBar.open * (1 - percentage), priceBar.open * (1 + percentage)];
                 }
 
                 else {
-                    return [priceBar.open * 0.996, priceBar.open * 1.998];
+                    return [priceBar.open * (1 - percentage * 2), priceBar.open * (1 - percentage)];
                 }
             }
         }
     }
 
-    //TODO: Return the profits's array
     run(pricesBars: Array<NsStrategy.priceBar>): Array<number> {
+
+        let firstBuyPrice = 0;
+        let secondBuyPrice = 0;
+
+
         for (const priceBar of pricesBars) {
 
             let firstLevels: Array<number> | undefined = [0, 0];
@@ -35,6 +43,7 @@ export default class Strategy_2 extends Strategy {
                     if (priceBar.low <= firstLevels[0]) {
                         logger.info(priceBar.timestamp);
                         logger.info(`Buy the first at ${priceBar.close}`);
+                        firstBuyPrice = priceBar.close;
                         this._inPositionArray[0] = true;
                     }
                 }
@@ -44,12 +53,14 @@ export default class Strategy_2 extends Strategy {
                     if (priceBar.low <= secondLevels[0]) {
                         logger.info(priceBar.timestamp);
                         logger.info(`Buy the second at ${priceBar.close}`);
+                        secondBuyPrice = priceBar.close;
                         this._inPositionArray[1] = true;
                     }
                     else if (priceBar.high >= firstLevels[1]) {
                         logger.info(priceBar.timestamp);
                         logger.info(`Sell the first at ${priceBar.close}`);
                         this._inPositionArray[0] = false;
+                        this._profits.push(priceBar.close - firstBuyPrice);
                     }
                 }
             }
@@ -59,8 +70,10 @@ export default class Strategy_2 extends Strategy {
                     logger.info(priceBar.timestamp);
                     logger.info(`Sell the second at ${priceBar.close}`);
                     this._inPosition = false;
+                    this._profits.push(priceBar.close - firstBuyPrice);
                 }
             }
         }
+        return this._profits;
     }
 }

@@ -30,6 +30,8 @@ import {
 import NsBotObject from "types/botObject";
 import NsGeneral from "types/general";
 import logger from "utils/logger";
+import Strategy_2 from "classes/strategies/strategy_2";
+import Strategy_1 from "classes/strategies/strategy_1";
 
 
 export default class Bot {
@@ -230,6 +232,12 @@ export default class Bot {
 
             // console.log(OHLCVs);
             console.log(priceBars);
+
+            const strategy = new Strategy_2();
+
+            if (priceBars !== undefined) {
+                console.log(strategy.run(priceBars));
+            }
 
 
             // Calls the strategy pool, which will call the strategies

@@ -5,14 +5,17 @@ import NsStrategy from "types/strategy";
 export default class Strategy_1 extends Strategy {
 
     run(pricesBars: Array<NsStrategy.priceBar>): Array<number> {
+
+        let buyPrice = 0;
+
+
         for (const priceBar of pricesBars) {
 
-            let buyPrice = 0;
             let boughtAt = 0;
             let tp = 0;
             let sl = 0;
 
-            const percentage = 0.02;
+            const percentage = 0.002;
 
             priceBar.pctChange = priceBar.close / priceBar.open - 1;
 
@@ -31,16 +34,15 @@ export default class Strategy_1 extends Strategy {
 
             else if (index > boughtAt) {
                 if (priceBar.high > tp) { //high
-                    this._profits.push(percentage);
+                    this._profits.push(priceBar.close - buyPrice);
                     this._inPosition = false;
                 }
 
                 else if (priceBar.low < sl) { //low
-                    this._profits.push(0 - percentage);
+                    this._profits.push(priceBar.close - buyPrice);
                     this._inPosition = false;
                 }
                 else {
-                    this._profits.push(19);
                     this._inPosition = false;
                 }
             }
