@@ -19,7 +19,7 @@
     </a>
 </p>
 
-**WORK IN PROGRESS..**
+### WORK IN PROGRESS..
 
 A crypto trading bot that uses the volatility of the market to make profits.
 
