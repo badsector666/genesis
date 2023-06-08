@@ -21,6 +21,7 @@ import logger from "utils/logger";
 export default class HSS {
     private _initialized: Promise<void>;
 
+    // TODO: Replace with a fake botObject
     private _tradingPair: { base: string, quote: string; };
     private _baseCurrency: string;
     private _quoteCurrency: string;
