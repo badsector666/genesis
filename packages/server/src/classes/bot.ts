@@ -1,8 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Exchange } from "ccxt";
 import lodash from "lodash";
 import { Db } from "mongodb";
 
 import Cache from "classes/cache";
+import Strategy_1 from "classes/strategies/strategy_1";
+import Strategy_2 from "classes/strategies/strategy_2";
+import Strategy_3 from "classes/strategies/strategy_3";
 import { botObject } from "configs/botObject.config";
 import { EXCHANGE_CONFIG, GENERAL_CONFIG } from "configs/global.config";
 import {
@@ -30,8 +34,6 @@ import {
 import NsBotObject from "types/botObject";
 import NsGeneral from "types/general";
 import logger from "utils/logger";
-import Strategy_2 from "classes/strategies/strategy_2";
-import Strategy_1 from "classes/strategies/strategy_1";
 
 
 export default class Bot {
@@ -233,7 +235,7 @@ export default class Bot {
             // console.log(OHLCVs);
             console.log(priceBars);
 
-            const strategy = new Strategy_2();
+            const strategy = new Strategy_3();
 
             if (priceBars !== undefined) {
                 console.log(strategy.run(priceBars));

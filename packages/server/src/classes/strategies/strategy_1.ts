@@ -15,18 +15,18 @@ export default class Strategy_1 extends Strategy {
             let tp = 0;
             let sl = 0;
 
-            const percentage = 0.002;
+            this.percentage = 0.002;
 
             priceBar.pctChange = priceBar.close / priceBar.open - 1;
 
             let index = 1;
 
             if (!this._inPosition) {
-                if (priceBar.pctChange > percentage / 2) {
+                if (priceBar.pctChange > this.percentage / 2) {
                     buyPrice = priceBar.close; //close
                     boughtAt = index;
-                    tp = buyPrice * (1 + percentage);
-                    sl = buyPrice * (1 - percentage);
+                    tp = buyPrice * (1 + this.percentage);
+                    sl = buyPrice * (1 - this.percentage);
                     this._inPosition = true;
                 }
 

@@ -1,24 +1,23 @@
 import Strategy from "classes/strategies/strategy";
 import NsStrategy from "types/strategy";
 import logger from "utils/logger";
-// import NsStrategy from "types/strategy";
 
 
 export default class Strategy_2 extends Strategy {
 
     getLevels(timestamp: number, priceBars: Array<NsStrategy.priceBar>, first = true) {
 
-        const percentage = 0.002;
+        this.percentage = 0.002;
 
 
         for (const priceBar of priceBars) {
             if (priceBar.timestamp === timestamp) {
                 if (first) {
-                    return [priceBar.open * (1 - percentage), priceBar.open * (1 + percentage)];
+                    return [priceBar.open * (1 - this.percentage), priceBar.open * (1 + this.percentage)];
                 }
 
                 else {
-                    return [priceBar.open * (1 - percentage * 2), priceBar.open * (1 - percentage)];
+                    return [priceBar.open * (1 - this.percentage * 2), priceBar.open * (1 - this.percentage)];
                 }
             }
         }
@@ -70,7 +69,7 @@ export default class Strategy_2 extends Strategy {
                     logger.info(priceBar.timestamp);
                     logger.info(`Sell the second at ${priceBar.close}`);
                     this._inPosition = false;
-                    this._profits.push(priceBar.close - firstBuyPrice);
+                    this._profits.push(priceBar.close - secondBuyPrice);
                 }
             }
         }
