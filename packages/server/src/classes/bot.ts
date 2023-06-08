@@ -1,12 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Exchange } from "ccxt";
 import lodash from "lodash";
 import { Db } from "mongodb";
 
 import Cache from "classes/cache";
-import Strategy1 from "classes/strategies/strategy1";
-import Strategy2 from "classes/strategies/strategy2";
-import Strategy3 from "classes/strategies/strategy3";
 import { botObject } from "configs/botObject.config";
 import { EXCHANGE_CONFIG, GENERAL_CONFIG } from "configs/global.config";
 import {
@@ -36,6 +32,9 @@ import NsGeneral from "types/general";
 import logger from "utils/logger";
 
 
+/**
+ * Main class of the bot.
+ */
 export default class Bot {
     private _botObject = lodash.cloneDeep(botObject);
     private _mongoDB: NsBotObject.IsMongoDB = {
@@ -45,7 +44,7 @@ export default class Bot {
 
 
     /**
-     * Creates a new bot instance and initialize it
+     * Creates a new bot instance and initialize it.
      *
      * @param tradingPair The trading pair (overridden in sandbox mode).
      * @param name The bot name (used for bot ID inside the database).
@@ -230,13 +229,6 @@ export default class Bot {
 
             const priceBars = this._botObject.local.cache?.priceBars;
             console.log(priceBars);
-
-            const strategy = new Strategy3();
-
-            if (priceBars !== undefined) {
-                console.log(strategy.run(priceBars));
-            }
-
 
             // Calls the strategy pool, which will call the strategies
             // Should decide if the data are recovered here or in the strategy pool
