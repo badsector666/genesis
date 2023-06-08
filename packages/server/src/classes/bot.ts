@@ -4,9 +4,9 @@ import lodash from "lodash";
 import { Db } from "mongodb";
 
 import Cache from "classes/cache";
-import Strategy_1 from "classes/strategies/strategy_1";
-import Strategy_2 from "classes/strategies/strategy_2";
-import Strategy_3 from "classes/strategies/strategy_3";
+import Strategy1 from "classes/strategies/strategy1";
+import Strategy2 from "classes/strategies/strategy2";
+import Strategy3 from "classes/strategies/strategy3";
 import { botObject } from "configs/botObject.config";
 import { EXCHANGE_CONFIG, GENERAL_CONFIG } from "configs/global.config";
 import {
@@ -228,14 +228,10 @@ export default class Bot {
                 await this._botObject.local.cache.update();
             }
 
-            // TODO: Add a simple strategy for test
-            // const OHLCVs = this._botObject.local.cache?.OHLCVs;
             const priceBars = this._botObject.local.cache?.priceBars;
-
-            // console.log(OHLCVs);
             console.log(priceBars);
 
-            const strategy = new Strategy_3();
+            const strategy = new Strategy3();
 
             if (priceBars !== undefined) {
                 console.log(strategy.run(priceBars));
