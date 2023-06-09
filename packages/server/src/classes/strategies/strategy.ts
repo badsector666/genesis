@@ -13,6 +13,13 @@ export default class Strategy {
 
     protected _profits: Array<number> = [];
 
+    protected buyTimestamps: Array<number> = [];
+    protected buyPrices: Array<number> = [];
+
+    protected sellTimestamps: Array<number> = [];
+    protected sellPrices: Array<number> = [];
+
+
     /**
      * Main function to run the strategy.
      * @param pricesBars The prices bars to run the strategy on.
