@@ -86,7 +86,7 @@ export default class Bot {
         this._botObject.start.ohlcvLimit = ohlcvLimit;
 
         // Logging
-        logger.info(`New "${name}" bot instance for ${tradingPair} created.`);
+        logger.info(`New '${name}' bot instance for '${tradingPair}' created.`);
         logger.info(`Sandbox mode: ${sandbox ? "enabled" : "disabled"}`);
         logger.info(`Initial quote balance: ${initialQuoteBalance} ${tradingPair.split("/")[1]}`);
         logger.info(`Timeframe: ${timeframe}`);

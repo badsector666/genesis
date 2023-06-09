@@ -129,6 +129,11 @@ export async function loadBalances(exchange: Exchange): Promise<Balances> {
 export function getBalance(balances: Balances, token: string): Balance {
     const balance = balances[token];
 
+    if (!balance) {
+        logger.error(`The token ${token} is not available!`);
+        process.exit(1);
+    }
+
     // Log the balance information
     logger.info(`${balance.free} ${token} available, ${balance.used} ${token} used.`);
 

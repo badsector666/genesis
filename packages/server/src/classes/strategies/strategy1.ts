@@ -1,4 +1,4 @@
-import Strategy from "classes/strategies/strategy";
+import { Strategy } from "classes/strategies";
 import NsStrategy from "types/strategy";
 
 

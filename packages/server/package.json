@@ -8,6 +8,7 @@
     "private": true,
     "scripts": {
         "start": "ts-node src/scripts/main.ts",
+        "score": "ts-node src/scripts/score.ts",
         "test": "mocha --exit --timeout 65000 --require node_modules/ts-node/register src/tests/*.test.ts",
         "test:coverage": "nyc yarn test"
     },

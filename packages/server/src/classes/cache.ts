@@ -9,6 +9,7 @@ import logger from "utils/logger";
 
 
 export default class Cache {
+    private _firstLoad = true;
     private _exchange: Exchange;
     private _tradingPair: string;
     private _timeframe: NsGeneral.IsTimeframe;
@@ -126,8 +127,8 @@ export default class Cache {
         // Sort the OHLCV candles by time
         const areCandlesCorrect = await this._sortOHLCV();
 
-        // If the candles are not correct, reload the cache
-        if (!areCandlesCorrect) {
+        // If the candles are not correct, reload the cache (except for the first load)
+        if (!areCandlesCorrect && !this._firstLoad) {
             logger.warn("The OHLCV candles are not correct, reloading the cache...");
 
             await this.load();
@@ -135,6 +136,9 @@ export default class Cache {
 
         // Convert to price bars
         this._priceBars = convertOHLCVsToPriceBars(this._OHLCVs);
+
+        // Set the first load to false
+        this._firstLoad = false;
     }
 
     /**
