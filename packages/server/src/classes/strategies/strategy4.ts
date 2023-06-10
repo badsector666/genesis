@@ -28,12 +28,10 @@ export default class Strategy4__CRYPTOCURRENCIES extends Strategy {
                 this.buyPrices.push(buyPrice);
                 this._inPosition = true;
                 //}
-            }
-            else {
+            } else {
                 if (priceBar.close > slAnchor) {
                     slAnchor = priceBar.close;
-                }
-                else if (priceBar.close < slAnchor * 0.97 || priceBar.close > buyPrice * 1.01) {
+                } else if (priceBar.close < slAnchor * 0.97 || priceBar.close > buyPrice * 1.01) {
                     this.sellTimestamps.push(priceBar.timestamp);
                     this.sellPrices.push(priceBar.close);
                     this._inPosition = false;

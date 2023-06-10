@@ -89,3 +89,14 @@ export function getTimeframe(
 export function getCurrentDateString() {
     return date.format(new Date(), GENERAL_CONFIG.dateFormat);
 }
+
+/**
+ * Returns a date with the specified number of days removed.
+ * @param date The date to remove days from.
+ * @param days The number of days to remove.
+ */
+export function removeDays(date: Date, days: number) {
+    const result = new Date(new Date().setDate(date.getDate() - days));
+
+    return result;
+}

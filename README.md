@@ -78,6 +78,13 @@ Systems
 -------
 More details about the systems used by the bot.
 
+#### Cache:
+This system is used to recover market data in an optimized way.
+
+#### Generator System (GS):
+This system is used to generate the data needed by the HSS to calculate the score of a strategy.
+It generates a JSON file containing the data of the market for each candle over a period of time.
+
 #### Historical Scoring System (HSS):
 This system is used to calculate the score of a strategy based on its performance on historical data.
 
@@ -115,11 +122,13 @@ Overall Schematic
 ```
 BOT
 |
-|-> Historical Scoring System (HSS)
+|-> Generator System (generator)
 |   |
-|   |-> Gives a score for each strategy
+|   |-> Historical Scoring System (HSS)
 |       |
-|       |-> Sent to the Strategy Pool (SP)
+|       |-> Gives a score for each strategy
+|           |
+|           |-> Sent to the Strategy Pool (SP)
 |
 |-> General Loop
 |   |

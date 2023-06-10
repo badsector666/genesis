@@ -190,7 +190,7 @@ export async function fetchTrades(exchange: Exchange, symbol: string): Promise<T
  * @param exchange The exchange.
  * @param symbol The symbol.
  * @param timeframe The timeframe.
- * @param since The since.
+ * @param since The since (in ms).
  * @param limit The limit.
  * @returns The OHLCV candles.
  */
