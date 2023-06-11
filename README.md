@@ -22,3 +22,12 @@
 ### WORK IN PROGRESS..
 
 A crypto trading bot that uses the volatility of the market to make profits.
+
+Packages
+--------
+This repository contains two packages, one for the client (website) and one for the server (bot).
+You can find them inside `packages/client` & `packages/server`.
+
+More details about the server can be found [here](https://github.com/yoratoni/genesis/tree/main/packages/server).
+
+The rest of the READMEs will be written later, as we are currently working on the server part of the bot.
