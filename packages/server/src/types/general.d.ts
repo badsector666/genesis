@@ -8,9 +8,11 @@ declare namespace NsGeneral {
      * Options for the generator system function.
      */
     interface generatorSystemOptions {
-        tradingPair: string;
+        path: string;
+        pair: string;
         timeframe: NsGeneral.IsTimeframe;
         since: number;
+        entriesPerPage: number;
     }
 }
 

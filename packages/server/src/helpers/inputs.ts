@@ -84,10 +84,27 @@ export function getTimeframe(
 
 /**
  * Get the current date string.
+ * @param format The date format (optional, defaults to general config dateFormat).
  * @returns The current date string.
  */
-export function getCurrentDateString() {
-    return date.format(new Date(), GENERAL_CONFIG.dateFormat);
+export function getCurrentDateString(format?: string) {
+    return date.format(
+        new Date(),
+        format ?? GENERAL_CONFIG.dateFormat
+    );
+}
+
+/**
+ * Get date string from a date.
+ * @param dateInput The date to get the string from.
+ * @param format The date format (optional, defaults to general config dateFormat).
+ * @returns The date string.
+ */
+export function getDateString(dateInput: Date, format?: string) {
+    return date.format(
+        dateInput,
+        format ?? GENERAL_CONFIG.dateFormat
+    );
 }
 
 /**
