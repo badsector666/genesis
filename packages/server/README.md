@@ -121,6 +121,8 @@ The command to run the generator is `yarn server:generate` and it supports the f
     represented as the amount of days before the current time (> 0).
 - `--entriesPerPage` The amount of entries per page (0 < entriesPerPage <= 512).
 
+Can be found inside `src/classes/systems/GS.ts`.
+
 #### Historical Scoring System (HSS):
 This system is used to calculate the score of a strategy based on its performance on historical data.
 
