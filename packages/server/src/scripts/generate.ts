@@ -19,18 +19,15 @@ import logger from "utils/logger";
  */
 async function main(args: minimist.ParsedArgs) {
     const options: NsGeneral.generatorSystemOptions = {
-        path: path.join(__dirname, "..", "..", "data"),
+        path: path.join(__dirname, "..", "json"),
         pair: "BNB/USDT",
         timeframe: "1m",
         since: 1,
         entriesPerPage: 512
     };
 
-    if (args.path) {
-        options.path = args.path as string;
-    } else {
-        logger.warn("No 'path' parameter provided, defaults to 'data' directory.");
-    }
+    // NOTE:
+    //  Skipping path -> fixed value to 'src/json'
 
     if (args.pair) {
         if (!args.pair.includes("/")) {
