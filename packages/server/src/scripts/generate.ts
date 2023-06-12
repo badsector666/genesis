@@ -3,7 +3,7 @@ import path from "path";
 
 import minimist from "minimist";
 
-import generator from "classes/systems/GS";
+import generator from "systems/GS";
 import NsGeneral from "types/general";
 import logger from "utils/logger";
 
