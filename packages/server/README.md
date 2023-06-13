@@ -79,9 +79,9 @@ BOT
 |   |
 |   |-> Historical Scoring System (HSS)
 |       |
-|       |-> Gives a score for each strategy
+|       |-> Gives a score for each strategy (called a pipe which a JSON result file)
 |           |
-|           |-> Sent to the Strategy Pool (SP)
+|           |-> Accessible by Strategy Pool (SP)
 |
 |-> General Loop
 |   |
@@ -121,12 +121,20 @@ The command to run the generator is `yarn server:generate` and it supports the f
     represented as the amount of days before the current time (> 0).
 - `--entriesPerPage` The amount of entries per page (0 < entriesPerPage <= 512).
 
-Can be found inside `src/classes/systems/GS.ts`.
+The default path for the generated data is `src/systems/generators/data/`.
+
+Can be found inside `src/systems/generators/GS.ts`.
 
 #### Historical Scoring System (HSS):
 This system is used to calculate the score of a strategy based on its performance on historical data.
 
-Can be found inside `src/classes/systems/HSS.ts`.
+It generates a JSON file containing a result for each strategy, the result contains the score of the strategy
+and other useful data.
+
+These result files are called pipes, they are used by the SP to weight the strategies.
+Their default path is `src/systems/generators/pipes/`.
+
+Can be found inside `src/systems/generators/HSS.ts`.
 
 #### Risk Management System (RMS):
 This fallback system used to prevent the SP from making stupid trades works on two basic systems:
@@ -135,7 +143,7 @@ This fallback system used to prevent the SP from making stupid trades works on t
 - The stop loss: This system is used to prevent the bot from losing money if the SP is not performing well,
   meaning that the RMS is the only system that can, in fact, make the bot lose money.
 
-Can be found inside `src/classes/systems/RMS.ts`.
+Can be found inside `src/systems/RMS.ts`.
 
 #### Strategy Pool (SP):
 This system contains all the strategies used to decide whether a trade should be made or not.
@@ -144,7 +152,7 @@ It is using the scoring system to weight the strategies, creating a basic govern
 It is also used to control each strategy by sending it the data it needs to work and
 receiving the data it produces.
 
-Can be found inside `src/classes/systems/SP.ts`.
+Can be found inside `src/systems/SP.ts`.
 
 #### Strategy (S):
 This is the basic system of the bot, it is used to decide whether a trade should be made or not.
@@ -154,6 +162,7 @@ Notes:
 - The strategy name should be in the format `strategy_<name>.ts`.
 - The strategy should be implemented inside `src/classes/strategies/`.
 - The strategy should be extended from the `Strategy` class (see `src/classes/strategies/strategy.ts`).
+- The strategy should be imported & exported inside `src/classes/strategies/index.ts`.
 
 Communication System
 --------------------

@@ -1,9 +1,9 @@
 import "configs/env";
-import path from "path";
 
 import minimist from "minimist";
 
-import generator from "systems/GS";
+import { GENERAL_CONFIG } from "configs/global.config";
+import generator from "systems/generators/GS";
 import NsGeneral from "types/general";
 import logger from "utils/logger";
 
@@ -19,7 +19,7 @@ import logger from "utils/logger";
  */
 async function main(args: minimist.ParsedArgs) {
     const options: NsGeneral.generatorSystemOptions = {
-        path: path.join(__dirname, "..", "json"),
+        path: GENERAL_CONFIG.dataPath,
         pair: "BNB/USDT",
         timeframe: "1m",
         since: 1,

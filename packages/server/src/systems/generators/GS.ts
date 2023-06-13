@@ -22,9 +22,9 @@ import logger from "utils/logger";
  *
  * Note: applies pagination to the data if the
  * amount of data is too large (> 'args.entriesPerPage' entries).
- * @param args - The command line arguments.
+ * @param args The command line arguments.
  */
-export default async function generator(
+export default async function main(
     args: NsGeneral.generatorSystemOptions
 ) {
     const tokens = parseTradingPair(args.pair);
