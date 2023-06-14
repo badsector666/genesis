@@ -2,3 +2,7 @@
 	path = packages/dashboard
 	url = git@github.com:cybearl/dashboard.git
 	branch = main
+[submodule ".\\packages\\core"]
+	path = .\\packages\\core
+	url = git@github.com:cybearl/core.git
+	branch = main
