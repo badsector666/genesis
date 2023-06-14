@@ -1,5 +1,6 @@
-import fs from 'fs';
-import path from 'path';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import fs from "fs";
+import path from "path";
 
 
 /**
@@ -7,9 +8,10 @@ import path from 'path';
  * @param dir
  * @returns jsonFiles
  */
-export function  getJsonFiles(dir: string) {
+export function  getJsonFiles(dir: string) { // utile ou juste searchJsonFiles(dir, "") ?
     const files = fs.readdirSync(dir);
     const jsonFiles: string[] = [];
+
 
     for (const file of files) {
         if (file.endsWith(".json")) {
@@ -30,6 +32,7 @@ export function searchJsonFiles(dir: string, query: string) {
     const files = fs.readdirSync(dir);
     const jsonFiles: string[] = [];
 
+
     for (const file of files) {
         if (file.endsWith(".json") && file.includes(query)) {
             jsonFiles.push(file);
@@ -43,8 +46,6 @@ export function searchJsonFiles(dir: string, query: string) {
 // Ou __dirname est le dossier courant, donc packages\server\src\systems
 // Donc le chemin par défault est packages\server\src\json
 
-// Le but, c'est d'utiliser fs pour lister les fichiers dans le dossier json
-// ensuite, de voir comment faire une recherche
 
 // Le truc se base en deux parties, ici, c'est la fonction qui prend des arguments classiques
 // et dans le dossier /scripts, on aura "score.ts" similaire à generate.ts, le système d'options est
