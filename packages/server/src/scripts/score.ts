@@ -3,8 +3,10 @@ import path from "path";
 
 import minimist from "minimist";
 
-import { searchJsonFiles } from "systems/HSS";
+import { GENERAL_CONFIG } from "configs/global.config";
+import score from "systems/generators/HSS";
 import logger from "utils/logger";
+
 
 
 async function main(args: minimist.ParsedArgs) {
@@ -22,7 +24,7 @@ async function main(args: minimist.ParsedArgs) {
         query = args.query as string;
     }
 
-    await searchJsonFiles(dir, query);
+    // await searchJsonFiles(dir, query);
 }
 
 const args = minimist(process.argv.slice(2));

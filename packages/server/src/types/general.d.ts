@@ -14,6 +14,15 @@ declare namespace NsGeneral {
         since: number;
         entriesPerPage: number;
     }
+
+    /**
+     * Options for the historical scoring system function (HSS).
+     */
+    interface historicalScoringSystemOptions {
+        path: string;
+        pair: string;
+        timeframe: NsGeneral.IsTimeframe;
+    }
 }
 
 
