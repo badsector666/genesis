@@ -1,0 +1,4 @@
+[submodule "packages/dashboard"]
+	path = packages/dashboard
+	url = git@github.com:cybearl/dashboard.git
+	branch = main
