@@ -6,9 +6,6 @@
     "author": "yoratoni <yoratoni.dev@gmail.com>",
     "license": "MIT",
     "private": true,
-    "workspaces": [
-        "packages/*"
-    ],
     "scripts": {
         "client:start": "yarn workspace client start",
         "client:build": "yarn workspace client build",
@@ -17,5 +14,8 @@
         "server:score": "yarn workspace server score",
         "server:test": "yarn workspace server test",
         "server:test:coverage": "yarn workspace server test:coverage"
-    }
+    },
+    "workspaces": [
+        "packages/*"
+    ]
 }
