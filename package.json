@@ -12,7 +12,8 @@
         "install": "yarn workspace core core-install",
         "core:main": "yarn workspace core main",
         "core:generate": "yarn workspace core generate",
-        "core:score": "yarn workspace core score"
+        "core:score": "yarn workspace core score",
+        "dashboard:dev": "yarn workspace dashboard dev"
     },
     "workspaces": [
         "packages/*"
