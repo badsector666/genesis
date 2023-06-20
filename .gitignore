@@ -7,6 +7,9 @@
 **/.nyc_output
 **/coverage
 
+# Archives
+archives
+
 # Logs
 **/logs
 
