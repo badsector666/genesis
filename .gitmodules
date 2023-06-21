@@ -6,3 +6,7 @@
 	path = packages/core
 	url = git@github.com:cybearl/core.git
 	branch = main
+[submodule ".\\packages\\website"]
+	path = .\\packages\\website
+	url = git@github.com:cybearl/website.git
+	branch = main
