@@ -10,3 +10,7 @@
 	path = .\\packages\\website
 	url = git@github.com:cybearl/website.git
 	branch = main
+[submodule ".\\packages\\assets"]
+	path = .\\packages\\assets
+	url = git@github.com:cybearl/assets.git
+	branch = main
